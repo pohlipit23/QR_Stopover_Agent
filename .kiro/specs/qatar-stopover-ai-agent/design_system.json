@@ -1,0 +1,221 @@
+{
+    "name": "Qatar Airways Digital Design System",
+    "version": "1.0.0",
+    "description": "A comprehensive design system for Qatar Airways web applications, based on official brand guidelines and website examples.",
+    "metadata": {
+      "author": "Gemini",
+      "lastUpdated": "2025-07-15"
+    },
+    "colors": {
+      "primary": {
+        "burgundy": {
+          "hex": "#662046",
+          "rgb": "102, 32, 70",
+          "description": "Primary brand color, used for main calls-to-action, headlines, and key brand elements."
+        }
+      },
+      "secondary": {
+        "oneworldBlue": {
+          "hex": "#120C80",
+          "rgb": "18, 12, 128",
+          "description": "Secondary color for oneworld alliance branding."
+        }
+      },
+      "neutral": {
+        "grey1": {
+          "hex": "#818A8F",
+          "rgb": "129, 138, 143",
+          "description": "Light grey for secondary text and borders."
+        },
+        "grey2": {
+          "hex": "#5E6A71",
+          "rgb": "94, 106, 113",
+          "description": "Medium grey for body text and UI elements."
+        },
+        "grey3": {
+          "hex": "#8E8F8B",
+          "rgb": "113, 112, 116",
+          "description": "Darker grey, specified for copy purposes."
+        },
+        "lightGrey": {
+          "hex": "#F5F5F7",
+          "rgb": "245, 245, 247",
+          "description": "Very light grey for backgrounds and card containers."
+        },
+        "white": {
+          "hex": "#FFFFFF",
+          "rgb": "255, 255, 255",
+          "description": "Primary background color and text on dark backgrounds."
+        },
+        "black": {
+          "hex": "#000000",
+          "rgb": "0, 0, 0",
+          "description": "For text and dark UI elements."
+        }
+      },
+      "accent": {
+        "red": {
+          "hex": "#D0021B",
+          "rgb": "208, 2, 27",
+          "description": "Used for special offers or alerts, like discounted prices."
+        }
+      }
+    },
+    "typography": {
+      "primaryFontFamily": "Jotia",
+      "secondaryFontFamily": "Arial",
+      "baseFontSize": "16px",
+      "styles": [
+        {
+          "name": "Heading 1",
+          "element": "h1",
+          "fontSize": "2.5rem",
+          "fontWeight": "700",
+          "lineHeight": "1.2",
+          "color": "colors.primary.burgundy.hex"
+        },
+        {
+          "name": "Heading 2",
+          "element": "h2",
+          "fontSize": "2rem",
+          "fontWeight": "500",
+          "lineHeight": "1.3",
+          "color": "colors.neutral.grey2.hex"
+        },
+        {
+          "name": "Heading 3",
+          "element": "h3",
+          "fontSize": "1.5rem",
+          "fontWeight": "500",
+          "lineHeight": "1.4",
+          "color": "colors.neutral.grey2.hex"
+        },
+        {
+          "name": "Body Text",
+          "element": "p",
+          "fontSize": "1rem",
+          "fontWeight": "400",
+          "lineHeight": "1.6",
+          "color": "colors.neutral.grey2.hex"
+        },
+        {
+          "name": "Link",
+          "element": "a",
+          "fontSize": "1rem",
+          "fontWeight": "500",
+          "color": "colors.primary.burgundy.hex",
+          "textDecoration": "none",
+          "hover": {
+            "textDecoration": "underline"
+          }
+        }
+      ]
+    },
+    "spacing": {
+      "baseUnit": "8px",
+      "scale": {
+        "xs": "4px",
+        "sm": "8px",
+        "md": "16px",
+        "lg": "24px",
+        "xl": "32px",
+        "xxl": "48px"
+      }
+    },
+    "borderRadius": {
+      "sm": "4px",
+      "md": "8px",
+      "lg": "16px",
+      "full": "9999px"
+    },
+    "shadows": {
+      "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+      "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+    },
+    "components": {
+      "button": {
+        "baseStyle": {
+          "padding": "12px 24px",
+          "borderRadius": "borderRadius.md",
+          "fontWeight": "500",
+          "fontSize": "1rem",
+          "cursor": "pointer",
+          "border": "1px solid transparent",
+          "transition": "background-color 0.3s ease"
+        },
+        "variants": {
+          "primary": {
+            "backgroundColor": "colors.primary.burgundy.hex",
+            "color": "colors.neutral.white.hex",
+            "hover": {
+              "backgroundColor": "#521a38"
+            }
+          },
+          "secondary": {
+            "backgroundColor": "colors.neutral.white.hex",
+            "color": "colors.primary.burgundy.hex",
+            "border": "1px solid colors.primary.burgundy.hex",
+            "hover": {
+              "backgroundColor": "#fdf7fa"
+            }
+          },
+          "ghost": {
+            "backgroundColor": "transparent",
+            "color": "colors.neutral.grey2.hex",
+            "hover": {
+              "backgroundColor": "colors.neutral.lightGrey.hex"
+            }
+          }
+        }
+      },
+      "card": {
+        "baseStyle": {
+          "backgroundColor": "colors.neutral.white.hex",
+          "borderRadius": "borderRadius.lg",
+          "boxShadow": "shadows.md",
+          "padding": "spacing.lg",
+          "overflow": "hidden"
+        }
+      },
+      "input": {
+        "baseStyle": {
+          "backgroundColor": "colors.neutral.white.hex",
+          "border": "1px solid colors.neutral.grey1.hex",
+          "borderRadius": "borderRadius.md",
+          "padding": "12px 16px",
+          "fontSize": "1rem",
+          "color": "colors.neutral.grey2.hex"
+        },
+        "focus": {
+          "borderColor": "colors.primary.burgundy.hex",
+          "boxShadow": "0 0 0 2px rgba(102, 32, 70, 0.2)"
+        }
+      },
+      "tabs": {
+        "container": {
+          "display": "flex",
+          "borderBottom": "1px solid colors.neutral.grey1.hex"
+        },
+        "tab": {
+          "padding": "12px 20px",
+          "cursor": "pointer",
+          "color": "colors.neutral.grey2.hex",
+          "borderBottom": "2px solid transparent"
+        },
+        "activeTab": {
+          "color": "colors.primary.burgundy.hex",
+          "fontWeight": "500",
+          "borderBottom": "2px solid colors.primary.burgundy.hex"
+        }
+      }
+    },
+    "layout": {
+      "container": {
+        "maxWidth": "1280px",
+        "margin": "0 auto",
+        "padding": "0 spacing.lg"
+      }
+    }
+  }
+  

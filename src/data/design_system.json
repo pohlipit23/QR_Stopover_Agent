@@ -1,0 +1,168 @@
+{
+  "version": "1.0.0",
+  "name": "Qatar Airways Digital Design System",
+  "colors": {
+    "primary": {
+      "burgundy": "#662046"
+    },
+    "secondary": {
+      "oneworldBlue": "#120C80"
+    },
+    "neutral": {
+      "grey1": "#818A8F",
+      "grey2": "#5E6A71",
+      "grey3": "#8E8F8B",
+      "lightGrey": "#F5F5F7",
+      "white": "#FFFFFF",
+      "black": "#000000"
+    },
+    "accent": {
+      "red": "#D0021B"
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "primary": "Jotia, Arial, sans-serif",
+      "fallback": "Arial, sans-serif"
+    },
+    "baseFontSize": "16px",
+    "headings": {
+      "h1": {
+        "fontSize": "2.5rem",
+        "fontWeight": "700",
+        "color": "#662046"
+      },
+      "h2": {
+        "fontSize": "2rem",
+        "fontWeight": "500",
+        "color": "#5E6A71"
+      },
+      "h3": {
+        "fontSize": "1.5rem",
+        "fontWeight": "500",
+        "color": "#5E6A71"
+      }
+    },
+    "body": {
+      "fontSize": "1rem",
+      "fontWeight": "400",
+      "color": "#5E6A71",
+      "lineHeight": "1.6"
+    },
+    "links": {
+      "fontSize": "1rem",
+      "fontWeight": "500",
+      "color": "#662046",
+      "textDecoration": "none",
+      "hover": {
+        "textDecoration": "underline"
+      }
+    }
+  },
+  "spacing": {
+    "baseUnit": "8px",
+    "scale": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "xxl": "48px"
+    }
+  },
+  "borderRadius": {
+    "sm": "4px",
+    "md": "8px",
+    "lg": "16px",
+    "full": "9999px"
+  },
+  "shadows": {
+    "sm": "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+    "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
+  },
+  "components": {
+    "buttons": {
+      "primary": {
+        "backgroundColor": "#662046",
+        "color": "#FFFFFF",
+        "padding": "12px 24px",
+        "borderRadius": "8px",
+        "fontWeight": "500",
+        "border": "none",
+        "hover": {
+          "backgroundColor": "#4a1832"
+        }
+      },
+      "secondary": {
+        "backgroundColor": "#FFFFFF",
+        "color": "#662046",
+        "padding": "12px 24px",
+        "borderRadius": "8px",
+        "fontWeight": "500",
+        "border": "1px solid #662046",
+        "hover": {
+          "backgroundColor": "#F5F5F7"
+        }
+      },
+      "ghost": {
+        "backgroundColor": "transparent",
+        "color": "#5E6A71",
+        "padding": "12px 24px",
+        "borderRadius": "8px",
+        "fontWeight": "400",
+        "border": "none",
+        "hover": {
+          "backgroundColor": "#F5F5F7"
+        }
+      }
+    },
+    "cards": {
+      "default": {
+        "backgroundColor": "#FFFFFF",
+        "borderRadius": "16px",
+        "padding": "24px",
+        "boxShadow": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+      }
+    },
+    "inputs": {
+      "default": {
+        "backgroundColor": "#FFFFFF",
+        "border": "1px solid #818A8F",
+        "borderRadius": "8px",
+        "padding": "12px 16px",
+        "fontSize": "1rem",
+        "focus": {
+          "borderColor": "#662046",
+          "boxShadow": "0 0 0 3px rgba(102, 32, 70, 0.1)"
+        }
+      }
+    },
+    "tabs": {
+      "container": {
+        "borderBottom": "1px solid #818A8F"
+      },
+      "active": {
+        "color": "#662046",
+        "fontWeight": "500",
+        "borderBottom": "2px solid #662046"
+      },
+      "inactive": {
+        "color": "#5E6A71",
+        "fontWeight": "400",
+        "borderBottom": "2px solid transparent"
+      }
+    }
+  },
+  "breakpoints": {
+    "mobile": "320px",
+    "tablet": "768px",
+    "desktop": "1024px",
+    "largeDesktop": "1440px"
+  },
+  "container": {
+    "maxWidth": "1280px",
+    "margin": "0 auto",
+    "padding": "24px"
+  }
+}

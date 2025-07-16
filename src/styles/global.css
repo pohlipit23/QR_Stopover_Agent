@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Qatar Airways Design System Base Styles */
+@layer base {
+  html {
+    font-family: 'Jotia', Arial, sans-serif;
+    font-size: 16px;
+  }
+  
+  body {
+    @apply text-neutral-grey2 bg-neutral-white;
+    line-height: 1.6;
+  }
+  
+  h1 {
+    @apply text-h1 font-bold text-primary-burgundy;
+  }
+  
+  h2 {
+    @apply text-h2 font-medium text-neutral-grey2;
+  }
+  
+  h3 {
+    @apply text-h3 font-medium text-neutral-grey2;
+  }
+  
+  a {
+    @apply text-primary-burgundy font-medium no-underline hover:underline;
+  }
+}
+
+@layer components {
+  /* Qatar Airways Button Components */
+  .btn-primary {
+    @apply bg-primary-burgundy text-neutral-white px-6 py-3 rounded-md font-medium border-none;
+    @apply hover:bg-opacity-80 transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-neutral-white text-primary-burgundy px-6 py-3 rounded-md font-medium;
+    @apply border border-primary-burgundy hover:bg-neutral-light transition-colors duration-200;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-neutral-grey2 px-6 py-3 rounded-md font-normal border-none;
+    @apply hover:bg-neutral-light transition-colors duration-200;
+  }
+  
+  /* Qatar Airways Card Components */
+  .card {
+    @apply bg-neutral-white rounded-lg p-6 shadow-md;
+  }
+  
+  /* Qatar Airways Input Components */
+  .input {
+    @apply bg-neutral-white border border-neutral-grey1 rounded-md px-4 py-3 text-base;
+    @apply focus:border-primary-burgundy focus:ring-2 focus:ring-primary-burgundy focus:ring-opacity-10;
+    @apply focus:outline-none transition-colors duration-200;
+  }
+  
+  /* Qatar Airways Tab Components */
+  .tabs-container {
+    @apply border-b border-neutral-grey1;
+  }
+  
+  .tab-active {
+    @apply text-primary-burgundy font-medium border-b-2 border-primary-burgundy;
+  }
+  
+  .tab-inactive {
+    @apply text-neutral-grey2 font-normal border-b-2 border-transparent;
+  }
+  
+  /* Container */
+  .container-qa {
+    @apply max-w-container mx-auto px-lg;
+  }
+}
+
+/* Touch targets for accessibility */
+@layer utilities {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
