@@ -1,0 +1,71 @@
+---
+import Layout from '../components/Layout.astro';
+import EmailTemplateComponent from '../components/EmailTemplate.tsx';
+import { sampleCustomer, sampleBooking } from '../data/customerData';
+---
+
+<Layout title="Email Template - Qatar Airways Stopover">
+  <div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <div class="mb-8 text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Qatar Airways Stopover Email Template</h1>
+        <p class="text-gray-600">Preview of the personalized stopover invitation email</p>
+      </div>
+      
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <EmailTemplateComponent 
+          customer={sampleCustomer} 
+          booking={sampleBooking}
+          onBuildStopover={() => {
+            console.log('Build My Stopover clicked from email template');
+            // This would redirect to the stopover builder or open the chat interface
+          }}
+          client:load
+        />
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Custom styles for Qatar Airways design system colors */
+  :global(.bg-primary-burgundy) {
+    background-color: #662046;
+  }
+  
+  :global(.text-primary-burgundy) {
+    color: #662046;
+  }
+  
+  :global(.bg-secondary-oneworld-blue) {
+    background-color: #120C80;
+  }
+  
+  :global(.text-neutral-grey2) {
+    color: #5E6A71;
+  }
+  
+  :global(.text-neutral-grey1) {
+    color: #818A8F;
+  }
+  
+  :global(.bg-neutral-light-grey) {
+    background-color: #F5F5F7;
+  }
+  
+  :global(.border-neutral-light-grey) {
+    border-color: #F5F5F7;
+  }
+  
+  :global(.font-jotia) {
+    font-family: 'Jotia', Arial, sans-serif;
+  }
+  
+  :global(.hover\:bg-neutral-light-grey:hover) {
+    background-color: #F5F5F7;
+  }
+  
+  :global(.hover\:text-primary-burgundy:hover) {
+    color: #662046;
+  }
+</style>

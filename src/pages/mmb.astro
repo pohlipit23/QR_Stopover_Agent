@@ -1,0 +1,68 @@
+---
+import Layout from '../components/Layout.astro';
+import MMBPage from '../components/MMBPage.tsx';
+import { sampleCustomer, sampleBooking } from '../data/customerData';
+---
+
+<Layout title="Manage My Booking - Qatar Airways">
+  <MMBPage 
+    customer={sampleCustomer} 
+    booking={sampleBooking}
+    onChatOpen={() => {
+      // This will be handled by the chat modal component when implemented
+      console.log('Chat opened from MMB page');
+    }}
+    client:load
+  />
+</Layout>
+
+<style>
+  /* Custom styles for Qatar Airways design system colors */
+  :global(.bg-neutral-light-grey) {
+    background-color: #F5F5F7;
+  }
+  
+  :global(.text-primary-burgundy) {
+    color: #662046;
+  }
+  
+  :global(.bg-primary-burgundy) {
+    background-color: #662046;
+  }
+  
+  :global(.border-primary-burgundy) {
+    border-color: #662046;
+  }
+  
+  :global(.text-neutral-grey2) {
+    color: #5E6A71;
+  }
+  
+  :global(.text-neutral-grey1) {
+    color: #818A8F;
+  }
+  
+  :global(.text-neutral-black) {
+    color: #000000;
+  }
+  
+  :global(.border-neutral-light-grey) {
+    border-color: #F5F5F7;
+  }
+  
+  :global(.bg-neutral-black) {
+    background-color: #000000;
+  }
+  
+  :global(.hover\:bg-primary-burgundy-dark:hover) {
+    background-color: #4a1832;
+  }
+  
+  :global(.hover\:bg-neutral-light-grey:hover) {
+    background-color: #F5F5F7;
+  }
+  
+  :global(.hover\:text-primary-burgundy:hover) {
+    color: #662046;
+  }
+</style>

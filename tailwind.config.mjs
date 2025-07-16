@@ -17,6 +17,7 @@ export default {
           grey2: designSystem.colors.neutral.grey2,
           grey3: designSystem.colors.neutral.grey3,
           light: designSystem.colors.neutral.lightGrey,
+          lightGrey: designSystem.colors.neutral.lightGrey,
           white: designSystem.colors.neutral.white,
           black: designSystem.colors.neutral.black,
         },
@@ -27,6 +28,7 @@ export default {
       fontFamily: {
         primary: ['Jotia', 'Arial', 'sans-serif'],
         fallback: ['Arial', 'sans-serif'],
+        jotia: ['Jotia', 'Arial', 'sans-serif'],
       },
       fontSize: {
         'h1': designSystem.typography.headings.h1.fontSize,
@@ -59,6 +61,24 @@ export default {
       },
       maxWidth: {
         'container': designSystem.container.maxWidth,
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.3s ease-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'spin': 'spin 1s linear infinite',
+      },
+      ringWidth: {
+        '3': '3px',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
       },
     },
   },

@@ -1,0 +1,381 @@
+/* Qatar Airways Stopover AI Agent - Global Styles */
+
+/* Import Qatar Airways Design System */
+@import './design-system.css';
+
+/* Import Tailwind CSS base, components, and utilities */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global base layer customizations */
+@layer base {
+  html {
+    font-family: theme('fontFamily.primary');
+    font-size: theme('fontSize.base');
+    line-height: 1.6;
+    color: theme('colors.neutral.grey2');
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: theme('colors.neutral.white');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+  
+  /* Heading styles using design system tokens */
+  h1 {
+    @apply text-h1 font-bold text-primary-burgundy mb-lg;
+  }
+  
+  h2 {
+    @apply text-h2 font-medium text-neutral-grey2 mb-md;
+  }
+  
+  h3 {
+    @apply text-h3 font-medium text-neutral-grey2 mb-md;
+  }
+  
+  /* Link styles */
+  a {
+    @apply text-primary-burgundy font-medium no-underline transition-all duration-200;
+  }
+  
+  a:hover {
+    @apply underline;
+  }
+  
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 3px solid rgba(102, 32, 70, 0.3);
+    outline-offset: 2px;
+  }
+  
+  /* Remove default button styles */
+  button {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+  
+  /* Remove default input styles */
+  input, textarea, select {
+    font: inherit;
+  }
+}
+
+/* Component layer for reusable component styles */
+@layer components {
+  /* Button Components */
+  .btn {
+    @apply inline-flex items-center justify-center px-6 py-3 rounded-md font-medium text-base no-underline cursor-pointer transition-all duration-200 border-none outline-none;
+    min-height: theme('accessibility.minTouchTarget');
+  }
+  
+  .btn:focus-visible {
+    outline: 3px solid rgba(102, 32, 70, 0.3);
+    outline-offset: 2px;
+  }
+  
+  .btn-primary {
+    @apply bg-primary-burgundy text-neutral-white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #4a1832;
+    transform: translateY(-1px);
+    box-shadow: theme('boxShadow.md');
+  }
+  
+  .btn-primary:active {
+    transform: translateY(0);
+    box-shadow: theme('boxShadow.sm');
+  }
+  
+  .btn-primary:disabled {
+    @apply bg-neutral-grey1 cursor-not-allowed;
+    transform: none;
+  }
+  
+  .btn-secondary {
+    @apply bg-neutral-white text-primary-burgundy border-2 border-primary-burgundy;
+  }
+  
+  .btn-secondary:hover {
+    @apply bg-neutral-light;
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary:active {
+    transform: translateY(0);
+  }
+  
+  .btn-secondary:disabled {
+    @apply border-neutral-grey1 text-neutral-grey1 cursor-not-allowed;
+    transform: none;
+  }
+  
+  .btn-ghost {
+    @apply bg-transparent text-neutral-grey2 font-normal;
+  }
+  
+  .btn-ghost:hover {
+    @apply bg-neutral-light text-primary-burgundy;
+  }
+  
+  .btn-ghost:active {
+    @apply bg-neutral-light;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-neutral-white rounded-lg p-lg shadow-md border border-neutral-light transition-all duration-200;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: theme('boxShadow.lg');
+  }
+  
+  .card-interactive {
+    @apply cursor-pointer border-2 border-transparent;
+  }
+  
+  .card-interactive:hover {
+    @apply border-primary-burgundy;
+  }
+  
+  .card-interactive.selected {
+    @apply border-primary-burgundy;
+    background-color: #FEFEFE;
+  }
+  
+  /* Input Components */
+  .input {
+    @apply bg-neutral-white border-2 border-neutral-light rounded-md px-4 py-3 text-base text-neutral-grey2 transition-all duration-200 outline-none w-full;
+    font-family: theme('fontFamily.primary');
+    min-height: theme('accessibility.minTouchTarget');
+  }
+  
+  .input:focus {
+    @apply border-primary-burgundy;
+    box-shadow: 0 0 0 3px rgba(102, 32, 70, 0.1);
+  }
+  
+  .input.error {
+    @apply border-accent-red;
+    box-shadow: 0 0 0 3px rgba(208, 2, 27, 0.1);
+  }
+  
+  .input:disabled {
+    @apply bg-neutral-light border-neutral-grey1 text-neutral-grey1 cursor-not-allowed;
+  }
+  
+  /* Tab Components */
+  .tabs {
+    @apply border-b-2 border-neutral-light flex gap-xl;
+  }
+  
+  .tab {
+    @apply py-3 text-base font-normal text-neutral-grey1 border-b-2 border-transparent cursor-pointer transition-all duration-200 no-underline flex items-center;
+    min-height: theme('accessibility.minTouchTarget');
+  }
+  
+  .tab:hover {
+    @apply text-neutral-grey2;
+  }
+  
+  .tab.active {
+    @apply text-primary-burgundy font-medium border-primary-burgundy;
+  }
+  
+  /* Message Bubble Components */
+  .message-bubble {
+    @apply p-md rounded-lg mb-sm break-words;
+    max-width: 80%;
+  }
+  
+  .message-bubble.agent {
+    @apply bg-neutral-light text-neutral-grey2 self-start;
+    border-radius: theme('borderRadius.lg') theme('borderRadius.lg') theme('borderRadius.lg') theme('borderRadius.sm');
+  }
+  
+  .message-bubble.user {
+    @apply bg-primary-burgundy text-neutral-white self-end;
+    border-radius: theme('borderRadius.lg') theme('borderRadius.lg') theme('borderRadius.sm') theme('borderRadius.lg');
+  }
+  
+  /* Suggested Reply Components */
+  .suggested-reply {
+    @apply bg-neutral-white text-primary-burgundy border-2 border-neutral-light rounded-full px-md py-sm text-sm font-normal cursor-pointer transition-all duration-200 no-underline inline-flex items-center m-1;
+    min-height: theme('accessibility.minTouchTarget');
+  }
+  
+  .suggested-reply:hover {
+    @apply border-primary-burgundy;
+    background-color: #FEFEFE;
+  }
+  
+  .suggested-reply:active {
+    @apply bg-primary-burgundy text-neutral-white;
+  }
+  
+  /* Container Components */
+  .container {
+    max-width: theme('maxWidth.container');
+    @apply mx-auto px-lg;
+  }
+  
+  /* Chat Interface Specific Components */
+  .chat-container {
+    @apply flex flex-col h-full bg-neutral-white;
+  }
+  
+  .chat-messages {
+    @apply flex-1 overflow-y-auto p-lg space-y-sm;
+  }
+  
+  .chat-input-container {
+    @apply border-t border-neutral-light p-lg bg-neutral-white;
+  }
+  
+  /* Loading States */
+  .loading-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-primary-burgundy;
+  }
+  
+  .loading-dots::after {
+    content: '';
+    animation: loading-dots 1.5s infinite;
+  }
+  
+  @keyframes loading-dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+  }
+}
+
+/* Utility layer for custom utilities */
+@layer utilities {
+  /* Accessibility utilities */
+  .sr-only {
+    @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+    clip: rect(0, 0, 0, 0);
+  }
+  
+  /* Touch target utilities */
+  .touch-target {
+    min-height: theme('accessibility.minTouchTarget');
+    min-width: theme('accessibility.minTouchTarget');
+  }
+  
+  /* Focus utilities */
+  .focus-ring {
+    outline: 3px solid rgba(102, 32, 70, 0.3);
+    outline-offset: 2px;
+  }
+  
+  /* Responsive text utilities */
+  .text-responsive-h1 {
+    @apply text-h1;
+  }
+  
+  .text-responsive-h2 {
+    @apply text-h2;
+  }
+  
+  .text-responsive-h3 {
+    @apply text-h3;
+  }
+  
+  @screen mobile {
+    .text-responsive-h1 {
+      font-size: 2rem;
+    }
+    
+    .text-responsive-h2 {
+      font-size: 1.75rem;
+    }
+    
+    .text-responsive-h3 {
+      font-size: 1.25rem;
+    }
+  }
+  
+  /* Scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-neutral-light rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-grey1 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-grey2;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .btn-primary {
+    border: 2px solid theme('colors.neutral.black');
+  }
+  
+  .card {
+    border: 2px solid theme('colors.neutral.grey2');
+  }
+  
+  .input {
+    border: 2px solid theme('colors.neutral.grey2');
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .loading-spinner {
+    animation: none;
+  }
+}
+
+/* Dark mode support (future enhancement) */
+@media (prefers-color-scheme: dark) {
+  /* Dark mode styles would go here if needed */
+}
+
+/* Print styles */
+@media print {
+  .btn, .suggested-reply {
+    @apply border border-neutral-grey2 bg-transparent text-neutral-black;
+  }
+  
+  .card {
+    @apply border border-neutral-grey2 shadow-none;
+  }
+  
+  .message-bubble.agent {
+    @apply border border-neutral-grey2 bg-transparent;
+  }
+  
+  .message-bubble.user {
+    @apply border border-neutral-grey2 bg-transparent text-neutral-black;
+  }
+}

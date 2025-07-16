@@ -1,0 +1,27 @@
+---
+import Layout from '../components/Layout.astro';
+import { sampleCustomer, sampleBooking } from '../data/index.ts';
+---
+
+<Layout title="MMB Page Test - Qatar Airways Stopover">
+  <div id="mmb-root"></div>
+</Layout>
+
+<script>
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import MMBPage from '../components/MMBPage.tsx';
+  import { sampleCustomer, sampleBooking } from '../data/index.ts';
+
+  const container = document.getElementById('mmb-root');
+  if (container) {
+    const root = createRoot(container);
+    root.render(
+      React.createElement(MMBPage, {
+        customer: sampleCustomer,
+        booking: sampleBooking,
+        onChatOpen: () => console.log('Chat opened from MMB page')
+      })
+    );
+  }
+</script>

@@ -1,11 +1,6 @@
 # Implementation Plan
 
 - [x] 1. Set up Astro project structure with Cloudflare Pages architecture
-
-
-
-
-
   - Create Astro project with React integration and TypeScript support
   - Configure Cloudflare Pages deployment with astro.config.mjs
   - Install required dependencies (Astro, React, TypeScript, Tailwind CSS, Hono for API)
@@ -15,7 +10,7 @@
   - Set up assets directory structure for provided images (logos, hotel images, category images, tour images)
   - _Requirements: 1.1, 12.1, 13.1_
 
-- [ ] 2. Implement comprehensive TypeScript data models and interfaces
+- [x] 2. Implement comprehensive TypeScript data models and interfaces
   - Create core data interfaces (CustomerData, BookingData, FlightRoute, ConversationState)
   - Implement stopover-specific models (StopoverCategory, HotelOption, TourOption, SelectedExtras)
   - Add authentication models (LoginData, PrivilegeClubAccount, PaymentData)
@@ -24,33 +19,45 @@
   - Add tour recommendation models (RecommendedTour with match scoring)
   - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 3. Create static data layer with comprehensive sample data
+- [x] 3. Create static data layer with comprehensive sample data
   - Implement customer data (Alex Johnson, PNR X4HG8, Privilege Club QR12345678)
   - Create hotel data with detailed amenities and pricing for five premium hotels using provided hotel images
   - Add stopover category data with star ratings and comprehensive pricing structure using provided category images
   - Implement tour data including "Whale Sharks of Qatar" with recommendation logic using provided tour images
   - Create transfer options data and pricing calculation utilities
-  - Add mock Privilege Club account data with Avios balance (15,000 Avios)
+  - Add mock Privilege Club account data with Avios balance (275,000 Avios)
   - Reference provided images in all data structures (hotel images, category images, tour images)
   - _Requirements: 13.1, 13.2, 13.3, 13.4, 13.5_
 
-- [ ] 4. Create Qatar Airways design system foundation
+- [x] 4. Create Qatar Airways design system foundation
   - Create design_system.json file with comprehensive Qatar Airways design tokens
   - Implement Jotia font family with Arial fallback and typography hierarchy
   - Configure Tailwind CSS with Qatar Airways color palette (burgundy #662046, oneworld blue #120C80)
   - Set up 8px base spacing system and responsive breakpoint configuration
   - Create component styling utilities for buttons, cards, inputs, and tabs
+  - Create design system utilities and validation functions
   - _Requirements: 12.1, 12.2, 12.3, 12.4, 12.5_
 
-- [ ] 5. Create entry point components
-- [ ] 5.1 Implement EmailTemplate component
+- [x] 5. Create entry point components
+
+
+
+
+- [x] 5.1 Implement EmailTemplate component
+
+
+
+
+
   - Build responsive email layout with Qatar Airways branding and Jotia typography
   - Use provided Qatar Airways logo and hero image of Doha for personalized content display
   - Implement "Build My Stopover" call-to-action button with burgundy primary styling
   - Integrate provided brand assets throughout the email template design
   - _Requirements: 1.1, 1.2, 12.1, 12.5_
 
-- [ ] 5.2 Implement MMBPage component
+- [x] 5.2 Implement MMBPage component
+
+
   - Create simplified Manage My Booking page layout with Qatar Airways design system
   - Use provided Qatar Airways logo in header and maintain consistent branding
   - Display booking details card with PNR X4HG8 and LHR-BKK routing
@@ -58,7 +65,12 @@
   - _Requirements: 1.3, 1.4, 11.4_
 
 - [ ] 6. Build core chat interface components
-- [ ] 6.1 Implement ChatContainer component
+- [x] 6.1 Implement ChatContainer component
+
+
+
+
+
   - Create main chat interface layout with responsive design and Qatar Airways styling
   - Handle modal overlay functionality for MMB entry point with proper z-index management
   - Implement conversation state management and message flow with error boundaries
@@ -66,16 +78,20 @@
   - _Requirements: 2.1, 11.1, 11.2_
 
 - [ ] 6.2 Implement MessageBubble component
+
+
+
+
   - Create agent and user message bubble styling with Qatar Airways brand colors
   - Support rich content rendering for cards, forms, and interactive elements
   - Add timestamp display with proper message alignment and spacing
   - Implement message metadata handling and delivery status indicators
-  - _Requirements: 12.3, 2.3_
+  - Add trigger functionality to ChatContainer from email-template.astro "Build My Stopover" button
+  - _Requirements: 12.3, 2.3, 1.1, 1.2_
 
 - [ ] 6.3 Implement MultiModalInput component
   - Build unified input interface with text field, voice button, and suggested reply chips
-  - Add voice input visual indicators and recording state management
-  - Implement suggested reply button rendering with Qatar Airways button styling
+  - Add voice input only as a visual indicator but don't implement the functionality during this phase. 
   - Handle input validation and multi-modal interaction switching
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
