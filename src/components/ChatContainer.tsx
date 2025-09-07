@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useChat } from 'ai/react';
 import MessageBubble from './MessageBubble';
 import MultiModalInput from './MultiModalInput';
 import type { 
@@ -36,6 +37,39 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   onClose,
   onConversationUpdate
 }) => {
+  // LLM Chat integration using Vercel AI SDK
+  const {
+    messages: chatMessages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading: isLLMLoading,
+    error: llmError,
+    append,
+    reload,
+    stop
+  } = useChat({
+    api: '/api/chat',
+    body: {
+      conversationContext: {
+        customer,
+        booking,
+        entryPoint
+      }
+    },
+    onError: (error) => {
+      console.error('LLM Chat error:', error);
+      handleError({
+        type: 'llm',
+        message: error.message || 'Failed to communicate with AI assistant',
+        retryable: true
+      });
+    },
+    onFinish: (message) => {
+      console.log('LLM response finished:', message);
+    }
+  });
+
   // State management
   const [state, setState] = useState<ChatContainerState>({
     conversation: {
@@ -87,6 +121,38 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     scrollToBottom();
   }, [state.conversation.messages, scrollToBottom]);
 
+  // Sync LLM messages with local state
+  useEffect(() => {
+    const convertedMessages: Message[] = chatMessages.map((msg, index) => ({
+      id: msg.id || `msg_${Date.now()}_${index}`,
+      sender: msg.role === 'user' ? 'user' : 'agent',
+      content: {
+        type: msg.toolInvocations && msg.toolInvocations.length > 0 ? 'rich' : 'text',
+        text: msg.content,
+        richContent: msg.toolInvocations?.[0]?.result?.uiComponent
+      },
+      timestamp: new Date(),
+      metadata: {
+        conversationId: conversationIdRef.current,
+        stepId: state.conversation.currentStep
+      }
+    }));
+
+    setState(prev => ({
+      ...prev,
+      conversation: {
+        ...prev.conversation,
+        messages: convertedMessages,
+        awaitingInput: !isLLMLoading
+      },
+      loading: {
+        ...prev.loading,
+        isLoading: isLLMLoading,
+        operation: isLLMLoading ? 'AI is thinking...' : ''
+      }
+    }));
+  }, [chatMessages, isLLMLoading, state.conversation.currentStep]);
+
   // Initialize conversation on mount
   useEffect(() => {
     initializeConversation();
@@ -115,36 +181,15 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   }, [state.conversation, customer, booking, onConversationUpdate]);
 
   // Initialize conversation with welcome message
-  const initializeConversation = useCallback(() => {
-    const welcomeMessage: Message = {
-      id: `msg_${Date.now()}_welcome`,
-      sender: 'agent',
-      content: {
-        type: 'text',
-        text: `Hello ${customer.name}! I'm here to help you add a stopover in Doha to your ${booking.route.origin} to ${booking.route.destination} journey (${booking.pnr}). Let's explore some amazing options for your layover!`
-      },
-      timestamp: new Date(),
-      metadata: {
-        conversationId: conversationIdRef.current,
-        stepId: 'welcome',
-        requiresResponse: true
-      }
-    };
-
-    setState(prev => ({
-      ...prev,
-      conversation: {
-        messages: [welcomeMessage],
-        currentStep: 'welcome',
-        awaitingInput: true,
-        suggestedReplies: [
-          "Let's get started!",
-          "Show me stopover options",
-          "What's included?"
-        ]
-      }
-    }));
-  }, [customer, booking]);
+  const initializeConversation = useCallback(async () => {
+    if (chatMessages.length === 0) {
+      // Send initial message to LLM to start conversation
+      await append({
+        role: 'user',
+        content: `Hello! I'm ${customer.name} and I have booking ${booking.pnr} from ${booking.route.origin} to ${booking.route.destination}. I'd like to explore adding a stopover in Doha.`
+      });
+    }
+  }, [customer, booking, chatMessages.length, append]);
 
   // Error boundary and recovery
   const handleError = useCallback((error: ErrorState) => {
@@ -152,30 +197,6 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       ...prev,
       error,
       loading: { isLoading: false, operation: '', progress: 0 }
-    }));
-
-    // Add error message to conversation
-    const errorMessage: Message = {
-      id: `msg_${Date.now()}_error`,
-      sender: 'agent',
-      content: {
-        type: 'text',
-        text: `I apologize, but I encountered an issue: ${error.message}. ${error.recoveryAction || 'Please try again.'}`
-      },
-      timestamp: new Date(),
-      metadata: {
-        conversationId: conversationIdRef.current,
-        stepId: 'error'
-      }
-    };
-
-    setState(prev => ({
-      ...prev,
-      conversation: {
-        ...prev.conversation,
-        messages: [...prev.conversation.messages, errorMessage],
-        suggestedReplies: error.retryable ? ['Try again', 'Start over'] : ['Start over']
-      }
     }));
   }, []);
 
@@ -196,75 +217,63 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   }, []);
 
   // Handle rich content actions from MessageBubble
-  const handleRichContentAction = useCallback((action: string, data: any) => {
+  const handleRichContentAction = useCallback(async (action: string, data: any) => {
     console.log('Rich content action:', action, data);
     
-    // Add user message for the action taken
-    const userMessage: Message = {
-      id: `msg_${Date.now()}_user_action`,
-      sender: 'user',
-      content: {
-        type: 'text',
-        text: `Selected: ${data.title || data.name || action}`
-      },
-      timestamp: new Date(),
-      metadata: {
-        conversationId: conversationIdRef.current,
-        stepId: state.conversation.currentStep
-      }
-    };
-
-    setState(prev => ({
-      ...prev,
-      conversation: {
-        ...prev.conversation,
-        messages: [...prev.conversation.messages, userMessage]
-      }
-    }));
-
-    // Handle different action types
+    let userMessage = '';
+    
+    // Handle different action types and send appropriate message to LLM
     switch (action) {
-      case 'select':
-        // Handle selection actions (hotels, categories, etc.)
+      case 'selectCategory':
+        userMessage = `I'd like to select the ${data.name} stopover category (${data.category}, $${data.pricePerNight}/night).`;
         break;
-      case 'next':
-        // Handle progression to next step
+      case 'selectHotel':
+        userMessage = `I'd like to select ${data.name} hotel (${data.category}, $${data.pricePerNight}/night).`;
+        break;
+      case 'selectTiming':
+        userMessage = `I'd like my stopover on the ${data} journey.`;
+        break;
+      case 'selectDuration':
+        userMessage = `I'd like to stay for ${data} night${data > 1 ? 's' : ''}.`;
+        break;
+      case 'selectExtras':
+        const extrasDescription = [];
+        if (data.transfers) extrasDescription.push('airport transfers');
+        if (data.tours && data.tours.length > 0) {
+          extrasDescription.push(`${data.tours.length} tour${data.tours.length > 1 ? 's' : ''}`);
+        }
+        userMessage = `I'd like to add ${extrasDescription.join(' and ')} to my booking. Total extras: $${data.totalExtrasPrice}.`;
+        break;
+      case 'selectTours':
+        userMessage = `I'd like to book ${data.length} tour${data.length > 1 ? 's' : ''} with a total of ${data.reduce((sum: number, tour: any) => sum + tour.quantity, 0)} participants.`;
+        break;
+      case 'payment':
+        userMessage = 'I\'d like to proceed to payment for my stopover booking.';
         break;
       default:
-        console.log('Unhandled action:', action);
+        userMessage = `Selected: ${data.name || data.title || action}`;
     }
-  }, [state.conversation.currentStep]);
+
+    // Send message to LLM
+    await append({
+      role: 'user',
+      content: userMessage
+    });
+  }, [append]);
 
   // Handle form submissions from MessageBubble
-  const handleFormSubmit = useCallback((formData: any) => {
+  const handleFormSubmit = useCallback(async (formData: any) => {
     console.log('Form submitted:', formData);
     
-    // Add user message for the form submission
-    const userMessage: Message = {
-      id: `msg_${Date.now()}_user_form`,
-      sender: 'user',
-      content: {
-        type: 'text',
-        text: 'Form submitted successfully'
-      },
-      timestamp: new Date(),
-      metadata: {
-        conversationId: conversationIdRef.current,
-        stepId: state.conversation.currentStep
-      }
-    };
-
-    setState(prev => ({
-      ...prev,
-      conversation: {
-        ...prev.conversation,
-        messages: [...prev.conversation.messages, userMessage]
-      }
-    }));
-  }, [state.conversation.currentStep]);
+    // Send form data to LLM
+    await append({
+      role: 'user',
+      content: `I've completed the form with the following details: ${JSON.stringify(formData)}`
+    });
+  }, [append]);
 
   // Handle user input from MultiModalInput
-  const handleUserInput = useCallback((input: UserInput) => {
+  const handleUserInput = useCallback(async (input: UserInput) => {
     console.log('User input received:', input);
     
     // Update voice recording state in UI
@@ -275,81 +284,12 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       }));
     }
     
-    // Add user message to conversation
-    const userMessage: Message = {
-      id: `msg_${Date.now()}_user_${input.type}`,
-      sender: 'user',
-      content: {
-        type: 'text',
-        text: input.content
-      },
-      timestamp: new Date(),
-      metadata: {
-        conversationId: conversationIdRef.current,
-        stepId: state.conversation.currentStep,
-        ...input.metadata
-      }
-    };
-
-    // Simulate agent response based on input
-    const generateAgentResponse = (userInput: string): Message => {
-      let responseText = '';
-      let newSuggestedReplies: string[] = [];
-      
-      const lowerInput = userInput.toLowerCase();
-      
-      if (lowerInput.includes('start') || lowerInput.includes('begin') || lowerInput.includes('get started')) {
-        responseText = "Perfect! Let's start by selecting your stopover category. I have four amazing options for you to choose from, each offering different levels of luxury and amenities.";
-        newSuggestedReplies = ['Show me the categories', 'What are my options?', 'Tell me about premium options'];
-      } else if (lowerInput.includes('option') || lowerInput.includes('show me')) {
-        responseText = "I'd be happy to show you the available stopover options! We have categories ranging from Standard to Luxury, each with carefully selected hotels and experiences.";
-        newSuggestedReplies = ['Show categories', 'What\'s included?', 'Tell me about hotels'];
-      } else if (lowerInput.includes('include') || lowerInput.includes('what')) {
-        responseText = "Great question! Each stopover package includes accommodation, and you can add extras like airport transfers and exciting tours. The packages vary by category - from comfortable Standard options to luxurious Premium Beach experiences.";
-        newSuggestedReplies = ['Show me categories', 'Tell me about tours', 'What are the prices?'];
-      } else {
-        responseText = "I understand! Let me help you find the perfect stopover experience. Would you like to see the available categories, or do you have specific questions about what's included?";
-        newSuggestedReplies = ['Show categories', 'What\'s included?', 'Tell me about pricing'];
-      }
-      
-      return {
-        id: `msg_${Date.now()}_agent_response`,
-        sender: 'agent',
-        content: {
-          type: 'text',
-          text: responseText
-        },
-        timestamp: new Date(),
-        metadata: {
-          conversationId: conversationIdRef.current,
-          stepId: state.conversation.currentStep,
-          requiresResponse: true
-        }
-      };
-    };
-
-    // Set loading state
-    setLoading({ isLoading: true, operation: 'Processing your message...' });
-    
-    // Simulate processing delay
-    setTimeout(() => {
-      const agentResponse = generateAgentResponse(input.content);
-      
-      setState(prev => ({
-        ...prev,
-        conversation: {
-          ...prev.conversation,
-          messages: [...prev.conversation.messages, userMessage, agentResponse],
-          suggestedReplies: agentResponse.metadata?.requiresResponse ? 
-            (agentResponse.content.text?.includes('categories') ? 
-              ['Show categories', 'What\'s included?', 'Tell me about pricing'] : 
-              ['Continue', 'Tell me more', 'What\'s next?']) : []
-        },
-        loading: { isLoading: false, operation: '', progress: 0 }
-      }));
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
-    
-  }, [state.conversation.currentStep, setLoading]);
+    // Send user input to LLM
+    await append({
+      role: 'user',
+      content: input.content
+    });
+  }, [append]);
 
   // Handle modal close with confirmation if conversation is active
   const handleClose = useCallback(() => {

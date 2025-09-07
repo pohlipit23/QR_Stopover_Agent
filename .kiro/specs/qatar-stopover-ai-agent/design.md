@@ -106,7 +106,12 @@ graph TB
     
     C --> C1[Message Handler]
     C --> C2[Flow Controller]
-    C --> C3[Response Generator]
+    C --> C3[LLM Integration Layer]
+    
+    C3 --> C4[OpenRouter Client]
+    C4 --> C5[Gemini 2.5 Flash Model]
+    C3 --> C6[Vercel AI SDK]
+    C3 --> C7[Prompt Engineering]
     
     D --> D1[Chat Components]
     D --> D2[Form Components]
@@ -116,6 +121,7 @@ graph TB
     E --> E1[Booking State]
     E --> E2[UI State]
     E --> E3[Customer Data]
+    E --> E4[Conversation Context]
     
     F[Static Data Layer] --> C
     F --> F1[Customer Data]
@@ -125,11 +131,12 @@ graph TB
 
 ### Component Architecture
 
-The application is structured around three main architectural layers, built on the Cloudflare platform:
+The application is structured around four main architectural layers, built on the Cloudflare platform:
 
 1. **Presentation Layer**: Astro-based front-end with React components deployed on Cloudflare Pages
 2. **Business Logic Layer**: Hono API on Cloudflare Workers managing conversation flow and booking logic
-3. **Data Layer**: Cloudflare's data services (D1, KV, R2) with Durable Objects for state management
+3. **AI Integration Layer**: LLM-powered conversation engine using OpenRouter and Vercel AI SDK
+4. **Data Layer**: Cloudflare's data services (D1, KV, R2) with Durable Objects for state management
 
 ### Architectural Benefits
 
@@ -139,16 +146,222 @@ The application is structured around three main architectural layers, built on t
 - **Cost Efficiency**: Pay-per-use model with zero egress fees for R2 storage
 - **Developer Experience**: Integrated CI/CD and modern development tools
 - **Security**: Built-in DDoS protection and edge security features
+- **AI Flexibility**: OpenRouter provides model diversity and fallback capabilities
+- **Streaming Performance**: Real-time LLM responses with optimized edge delivery
+
+## LLM Integration Architecture
+
+### AI-Powered Conversation Engine
+
+The application integrates a sophisticated LLM-powered conversation engine that drives natural language interactions while maintaining structured booking flow control.
+
+#### LLM Integration Stack
+
+**OpenRouter Integration**
+- **Service**: OpenRouter API as the model interface layer
+- **Purpose**: Unified API access to multiple LLM providers with fallback capabilities
+- **Configuration**: Environment-based model selection with Gemini 2.5 Flash as default
+- **Benefits**: Model flexibility, cost optimization, and provider redundancy
+
+**Vercel AI SDK Framework**
+- **Framework**: Vercel AI SDK for streamlined LLM integration
+- **Features**: Streaming responses, function calling, structured outputs, conversation memory
+- **Integration**: Seamless integration with React components and Cloudflare Workers
+- **Benefits**: Type-safe LLM interactions, built-in streaming, and conversation state management
+
+**Gemini 2.5 Flash Model**
+- **Default Model**: Google's Gemini 2.5 Flash via OpenRouter
+- **Capabilities**: Fast inference, multimodal understanding, function calling, structured outputs
+- **Context Window**: 1M+ tokens for comprehensive conversation context
+- **Rationale**: Optimal balance of speed, capability, and cost for conversational booking flows
+
+#### LLM Architecture Components
+
+```mermaid
+graph TB
+    subgraph "LLM Integration Layer"
+        A[Conversation Controller] --> B[Prompt Engineering Engine]
+        B --> C[OpenRouter Client]
+        C --> D[Gemini 2.5 Flash]
+        
+        A --> E[Function Calling Handler]
+        E --> F[Booking Actions]
+        E --> G[UI Component Triggers]
+        
+        A --> H[Context Manager]
+        H --> I[Conversation Memory]
+        H --> J[Booking State Context]
+        H --> K[Customer Data Context]
+        
+        L[Response Processor] --> A
+        L --> M[Structured Output Parser]
+        L --> N[UI Component Generator]
+    end
+```
+
+#### Core LLM Components
+
+**ConversationController**
+- **Purpose**: Central orchestrator for LLM-powered conversations
+- **Responsibilities**: Message routing, context management, response processing
+- **Integration**: Vercel AI SDK with OpenRouter provider configuration
+- **Features**: Streaming responses, function calling coordination, conversation state persistence
+
+**PromptEngineeringEngine**
+- **Purpose**: Dynamic prompt generation and context injection
+- **Responsibilities**: System prompt management, context formatting, conversation history optimization
+- **Features**: Role-based prompting, booking flow guidance, brand voice consistency
+- **Context Sources**: Customer data, booking state, available options, conversation history
+
+**FunctionCallingHandler**
+- **Purpose**: Structured interaction between LLM and booking system
+- **Responsibilities**: Function definition, parameter validation, action execution
+- **Available Functions**: Hotel selection, tour booking, payment processing, summary generation
+- **Integration**: Type-safe function definitions with automatic UI component triggering
+
+**ContextManager**
+- **Purpose**: Comprehensive context management for conversation continuity
+- **Responsibilities**: Memory persistence, context window optimization, state synchronization
+- **Storage**: Durable Objects for conversation state, KV store for customer context
+- **Features**: Automatic context pruning, priority-based context retention
+
+### LLM Integration Models
+
+```typescript
+interface LLMConfiguration {
+  provider: 'openrouter';
+  model: 'google/gemini-2.0-flash-exp' | 'anthropic/claude-3-haiku' | 'openai/gpt-4o-mini';
+  apiKey: string;
+  baseURL: string;
+  maxTokens: number;
+  temperature: number;
+  streamingEnabled: boolean;
+}
+
+interface ConversationContext {
+  customerId: string;
+  bookingData: BookingData;
+  conversationHistory: Message[];
+  currentStep: BookingStep;
+  availableActions: AvailableAction[];
+  systemPrompt: string;
+  contextWindow: ContextWindow;
+}
+
+interface LLMFunction {
+  name: string;
+  description: string;
+  parameters: JSONSchema;
+  handler: (params: any) => Promise<FunctionResult>;
+}
+
+interface FunctionResult {
+  success: boolean;
+  data?: any;
+  uiComponent?: ComponentDefinition;
+  nextStep?: BookingStep;
+  error?: string;
+}
+
+interface ComponentDefinition {
+  type: 'carousel' | 'form' | 'summary' | 'payment';
+  props: Record<string, any>;
+  data: any;
+}
+```
+
+### Available LLM Functions
+
+The system provides structured functions that the LLM can call to interact with the booking system:
+
+```typescript
+const availableFunctions: LLMFunction[] = [
+  {
+    name: 'showStopoverCategories',
+    description: 'Display stopover category options to the customer',
+    parameters: { type: 'object', properties: {} },
+    handler: async () => ({
+      success: true,
+      uiComponent: { type: 'carousel', props: { categories: stopoverCategories } }
+    })
+  },
+  {
+    name: 'selectStopoverCategory',
+    description: 'Process customer selection of stopover category',
+    parameters: {
+      type: 'object',
+      properties: { categoryId: { type: 'string' } },
+      required: ['categoryId']
+    },
+    handler: async ({ categoryId }) => ({
+      success: true,
+      nextStep: 'hotel-selection',
+      uiComponent: { type: 'carousel', props: { hotels: getHotelsByCategory(categoryId) } }
+    })
+  },
+  {
+    name: 'processPayment',
+    description: 'Initiate payment process with selected options',
+    parameters: {
+      type: 'object',
+      properties: {
+        paymentMethod: { type: 'string', enum: ['credit-card', 'avios'] },
+        amount: { type: 'number' }
+      },
+      required: ['paymentMethod', 'amount']
+    },
+    handler: async ({ paymentMethod, amount }) => ({
+      success: true,
+      uiComponent: { type: 'payment', props: { method: paymentMethod, amount } }
+    })
+  }
+];
+```
+
+### Prompt Engineering Strategy
+
+**System Prompt Template**
+```typescript
+const systemPrompt = `
+You are a Qatar Airways stopover booking assistant. Your role is to help customers add stopover packages in Doha to their existing flight bookings through natural conversation.
+
+CUSTOMER CONTEXT:
+- Name: ${customer.name}
+- Booking PNR: ${booking.pnr}
+- Route: ${booking.route}
+- Passengers: ${booking.passengers}
+
+CONVERSATION GUIDELINES:
+1. Maintain Qatar Airways' professional yet friendly tone
+2. Guide customers through: category selection → hotel selection → timing/duration → extras → payment
+3. Use available functions to display interactive components
+4. Always confirm selections before proceeding
+5. Provide clear pricing information at each step
+6. Handle questions about Doha attractions and logistics
+
+AVAILABLE ACTIONS:
+${availableFunctions.map(f => `- ${f.name}: ${f.description}`).join('\n')}
+
+Current conversation step: ${currentStep}
+`;
+```
+
+**Dynamic Context Injection**
+- Real-time booking state integration
+- Customer preference learning
+- Conversation history summarization
+- Available inventory updates
 
 ## Components and Interfaces
 
 ### Core Chat Interface Components
 
 #### ChatContainer
-- **Purpose**: Main container managing the entire chat experience
-- **Responsibilities**: Layout management, responsive behavior, modal handling
-- **Props**: `entryPoint: 'email' | 'mmb'`, `isModal: boolean`
-- **State**: Current conversation state, UI visibility flags
+- **Purpose**: Main container managing the entire chat experience with LLM integration
+- **Responsibilities**: Layout management, responsive behavior, modal handling, LLM conversation orchestration
+- **Props**: `entryPoint: 'email' | 'mmb'`, `isModal: boolean`, `llmConfig: LLMConfiguration`
+- **State**: Current conversation state, UI visibility flags, LLM streaming status
+- **LLM Integration**: Vercel AI SDK useChat hook for streaming conversations
 
 #### MessageBubble
 - **Purpose**: Individual message rendering for agent and user messages
@@ -157,10 +370,11 @@ The application is structured around three main architectural layers, built on t
 - **Variants**: Text messages, rich content cards, form containers
 
 #### MultiModalInput
-- **Purpose**: Unified input interface supporting text, voice, and button interactions
-- **Responsibilities**: Input capture, voice recognition interface, suggested reply rendering
-- **Props**: `onSubmit: (input: UserInput) => void`, `suggestedReplies: string[]`
-- **State**: Input text, voice recording status, input method tracking
+- **Purpose**: Unified input interface supporting text, voice, and button interactions with LLM streaming
+- **Responsibilities**: Input capture, voice recognition interface, suggested reply rendering, streaming message handling
+- **Props**: `onSubmit: (input: UserInput) => void`, `suggestedReplies: string[]`, `isStreaming: boolean`
+- **State**: Input text, voice recording status, input method tracking, LLM response streaming
+- **LLM Integration**: Real-time streaming display, typing indicators, function call visualization
 
 ### Rich Content Components
 
@@ -326,6 +540,18 @@ interface ConversationState {
   currentStep: ConversationStep;
   awaitingInput: boolean;
   suggestedReplies: string[];
+  llmState: LLMConversationState;
+}
+
+interface LLMConversationState {
+  isStreaming: boolean;
+  currentModel: string;
+  conversationId: string;
+  contextWindow: Message[];
+  functionCallsAvailable: LLMFunction[];
+  systemPrompt: string;
+  temperature: number;
+  maxTokens: number;
 }
 ```
 
@@ -338,19 +564,47 @@ interface Message {
   content: MessageContent;
   timestamp: Date;
   metadata?: MessageMetadata;
+  llmMetadata?: LLMMessageMetadata;
 }
 
 interface MessageContent {
-  type: 'text' | 'rich' | 'form' | 'summary';
+  type: 'text' | 'rich' | 'form' | 'summary' | 'streaming';
   text?: string;
   richContent?: RichContent;
   formData?: FormContent;
+  streamingContent?: StreamingContent;
+}
+
+interface LLMMessageMetadata {
+  model: string;
+  tokens: {
+    prompt: number;
+    completion: number;
+    total: number;
+  };
+  functionCalls?: FunctionCall[];
+  streamingComplete: boolean;
+  processingTime: number;
+}
+
+interface StreamingContent {
+  partialText: string;
+  isComplete: boolean;
+  functionCallsInProgress: FunctionCall[];
+}
+
+interface FunctionCall {
+  name: string;
+  parameters: Record<string, any>;
+  result?: FunctionResult;
+  status: 'pending' | 'executing' | 'completed' | 'error';
 }
 
 interface UserInput {
   type: 'text' | 'voice' | 'button';
   content: string;
   metadata?: InputMetadata;
+  conversationContext?: ConversationContext;
 }
 ```
 
@@ -418,6 +672,8 @@ interface RecommendedTour extends TourOption {
 2. **Voice Input Fallback**: Text input available when voice recognition fails
 3. **Network Simulation**: Graceful handling of simulated network delays
 4. **Data Consistency**: Validation of booking data integrity throughout flow
+5. **LLM Response Validation**: Function call parameter validation and response sanitization
+6. **Model Fallback**: Automatic fallback to alternative models via OpenRouter on failures
 
 ### Error Recovery Patterns
 
@@ -425,15 +681,27 @@ interface RecommendedTour extends TourOption {
 - **Voice Recognition Failure**: Automatic fallback to text input with user notification
 - **Form Validation Errors**: Inline error display with field-specific guidance
 - **State Corruption**: Automatic state recovery with conversation restart option
+- **LLM API Failures**: Model fallback chain (Gemini 2.5 Flash → Claude 3 Haiku → GPT-4o Mini)
+- **Function Call Errors**: Graceful error handling with conversational recovery
+- **Streaming Interruptions**: Resume capability and partial response handling
 
 ### User Feedback Mechanisms
 
 ```typescript
 interface ErrorState {
-  type: 'validation' | 'system' | 'network';
+  type: 'validation' | 'system' | 'network' | 'llm' | 'function-call';
   message: string;
   recoveryAction?: string;
   retryable: boolean;
+  llmError?: LLMErrorDetails;
+}
+
+interface LLMErrorDetails {
+  model: string;
+  errorType: 'rate-limit' | 'context-length' | 'api-error' | 'timeout' | 'invalid-response';
+  fallbackModel?: string;
+  retryAttempt: number;
+  maxRetries: number;
 }
 
 interface LoadingState {
@@ -441,6 +709,138 @@ interface LoadingState {
   operation: string;
   progress?: number;
 }
+```
+
+## LLM Implementation Configuration
+
+### Environment Setup
+
+**Required Environment Variables**
+```bash
+# OpenRouter Configuration
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+
+# Model Configuration
+DEFAULT_MODEL=google/gemini-2.0-flash-exp
+FALLBACK_MODELS=anthropic/claude-3-haiku,openai/gpt-4o-mini
+MAX_TOKENS=4096
+TEMPERATURE=0.7
+
+# Conversation Configuration
+MAX_CONTEXT_MESSAGES=20
+CONTEXT_WINDOW_TOKENS=100000
+FUNCTION_CALLING_ENABLED=true
+STREAMING_ENABLED=true
+```
+
+**Package Dependencies**
+```json
+{
+  "dependencies": {
+    "@vercel/ai": "^3.0.0",
+    "openai": "^4.0.0",
+    "zod": "^3.22.0"
+  }
+}
+```
+
+### LLM Service Implementation
+
+**OpenRouter Client Configuration**
+```typescript
+import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
+
+const openrouter = createOpenAI({
+  apiKey: process.env.OPENROUTER_API_KEY,
+  baseURL: 'https://openrouter.ai/api/v1',
+});
+
+export const llmConfig = {
+  model: openrouter(process.env.DEFAULT_MODEL || 'google/gemini-2.0-flash-exp'),
+  fallbackModels: [
+    openrouter('anthropic/claude-3-haiku'),
+    openrouter('openai/gpt-4o-mini')
+  ],
+  maxTokens: parseInt(process.env.MAX_TOKENS || '4096'),
+  temperature: parseFloat(process.env.TEMPERATURE || '0.7'),
+};
+```
+
+**Conversation API Endpoint**
+```typescript
+// /api/chat/route.ts
+import { streamText } from 'ai';
+import { llmConfig } from '@/lib/llm-config';
+import { bookingFunctions } from '@/lib/booking-functions';
+
+export async function POST(req: Request) {
+  const { messages, conversationContext } = await req.json();
+  
+  const result = await streamText({
+    model: llmConfig.model,
+    messages,
+    tools: bookingFunctions,
+    system: generateSystemPrompt(conversationContext),
+    maxTokens: llmConfig.maxTokens,
+    temperature: llmConfig.temperature,
+  });
+  
+  return result.toAIStreamResponse();
+}
+```
+
+### Function Calling Implementation
+
+**Booking Functions Definition**
+```typescript
+import { z } from 'zod';
+import { tool } from 'ai';
+
+export const bookingFunctions = {
+  showStopoverCategories: tool({
+    description: 'Display available stopover categories to the customer',
+    parameters: z.object({}),
+    execute: async () => {
+      return {
+        categories: stopoverCategories,
+        uiComponent: 'StopoverCategoryCarousel'
+      };
+    }
+  }),
+  
+  selectHotel: tool({
+    description: 'Process hotel selection and move to next step',
+    parameters: z.object({
+      hotelId: z.string(),
+      categoryId: z.string()
+    }),
+    execute: async ({ hotelId, categoryId }) => {
+      const hotel = await getHotelById(hotelId);
+      return {
+        selectedHotel: hotel,
+        nextStep: 'timing-selection',
+        uiComponent: 'StopoverOptions'
+      };
+    }
+  }),
+  
+  processPayment: tool({
+    description: 'Initialize payment process',
+    parameters: z.object({
+      paymentMethod: z.enum(['credit-card', 'avios']),
+      totalAmount: z.number()
+    }),
+    execute: async ({ paymentMethod, totalAmount }) => {
+      return {
+        paymentInitialized: true,
+        uiComponent: 'PaymentForm',
+        paymentData: { method: paymentMethod, amount: totalAmount }
+      };
+    }
+  })
+};
 ```
 
 ## Testing Strategy
@@ -451,6 +851,8 @@ interface LoadingState {
 2. **Integration Tests**: Component interaction and state management
 3. **Visual Regression Tests**: Design system compliance and responsive behavior
 4. **Accessibility Tests**: WCAG compliance and keyboard navigation
+5. **LLM Integration Tests**: Function calling, streaming responses, and model fallbacks
+6. **Conversation Flow Tests**: Multi-turn conversation handling and context management
 
 ### User Flow Testing
 
@@ -458,6 +860,8 @@ interface LoadingState {
 2. **Cross-Device Testing**: Responsive behavior across device types
 3. **Multi-Modal Input Testing**: Text, voice, and button interaction validation
 4. **State Persistence Testing**: Conversation state management across interactions
+5. **LLM Response Testing**: Function call accuracy, response quality, and error handling
+6. **Model Fallback Testing**: Automatic model switching and graceful degradation
 
 ### Test Data Management
 
@@ -468,6 +872,23 @@ interface TestScenarios {
   edgeCases: EdgeCaseTest[];
   accessibility: AccessibilityTest[];
   performance: PerformanceTest[];
+  llmScenarios: LLMTestScenarios;
+}
+
+interface LLMTestScenarios {
+  conversationFlows: ConversationTest[];
+  functionCalling: FunctionCallTest[];
+  modelFallbacks: ModelFallbackTest[];
+  streamingTests: StreamingTest[];
+  contextManagement: ContextTest[];
+}
+
+interface ConversationTest {
+  name: string;
+  userInputs: string[];
+  expectedFunctionCalls: string[];
+  expectedUIComponents: string[];
+  conversationContext: ConversationContext;
 }
 ```
 

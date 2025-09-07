@@ -1,5 +1,10 @@
 import React from 'react';
-import type { Message, RichContent, FormContent } from '../types';
+import type { Message, RichContent, FormContent, StopoverCategory, HotelOption, SelectedExtras, SelectedTour } from '../types';
+import StopoverCategoryCarousel from './StopoverCategoryCarousel';
+import HotelCarousel from './HotelCarousel';
+import StopoverOptions from './StopoverOptions';
+import StopoverExtras from './StopoverExtras';
+import ToursCarousel from './ToursCarousel';
 
 interface MessageBubbleProps {
   message: Message;
@@ -71,6 +76,57 @@ const RichContentRenderer: React.FC<{
   onAction?: (action: string, data: any) => void;
 }> = ({ content, onAction }) => {
   switch (content.type) {
+    case 'stopover-categories':
+      return (
+        <StopoverCategoryCarousel
+          categories={content.data.categories || []}
+          onCategorySelect={(category: StopoverCategory) => onAction?.('selectCategory', category)}
+          selectedCategoryId={content.data.selectedCategoryId}
+        />
+      );
+
+    case 'hotels':
+      return (
+        <HotelCarousel
+          hotels={content.data.hotels || []}
+          onHotelSelect={(hotel: HotelOption) => onAction?.('selectHotel', hotel)}
+          selectedHotelId={content.data.selectedHotelId}
+        />
+      );
+
+    case 'stopover-options':
+      return (
+        <StopoverOptions
+          onTimingSelect={(timing: 'outbound' | 'return') => onAction?.('selectTiming', timing)}
+          onDurationSelect={(nights: number) => onAction?.('selectDuration', nights)}
+          selectedTiming={content.data.selectedTiming}
+          selectedDuration={content.data.selectedDuration}
+          originalRoute={content.data.originalRoute}
+        />
+      );
+
+    case 'stopover-extras':
+      return (
+        <StopoverExtras
+          transfers={content.data.transfers}
+          tours={content.data.tours || []}
+          recommendedTour={content.data.recommendedTour}
+          onExtrasChange={(extras: SelectedExtras) => onAction?.('selectExtras', extras)}
+          selectedExtras={content.data.selectedExtras}
+          passengers={content.data.passengers}
+        />
+      );
+
+    case 'tours':
+      return (
+        <ToursCarousel
+          tours={content.data.tours || []}
+          selectedTours={content.data.selectedTours || []}
+          onToursChange={(tours: SelectedTour[]) => onAction?.('selectTours', tours)}
+          maxParticipants={content.data.maxParticipants}
+        />
+      );
+
     case 'carousel':
       return (
         <div className="space-y-3">

@@ -195,8 +195,8 @@ const MultiModalInput: React.FC<MultiModalInputProps> = ({
   // Process voice recording (mock implementation)
   const processVoiceRecording = useCallback(async () => {
     try {
-      // Create audio blob
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      // Create audio blob for future processing
+      // const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
       
       // Mock voice-to-text processing
       // In a real implementation, this would send the audio to a speech recognition service
@@ -314,7 +314,7 @@ const MultiModalInput: React.FC<MultiModalInputProps> = ({
               type="text"
               value={textInput}
               onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder={voiceState.isRecording ? "Recording..." : placeholder}
               disabled={disabled || isLoading || voiceState.isRecording || voiceState.isProcessing}
               className={`

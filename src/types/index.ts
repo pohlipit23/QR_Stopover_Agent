@@ -135,7 +135,7 @@ export interface MessageMetadata {
 }
 
 export interface RichContent {
-  type: 'carousel' | 'card' | 'form' | 'summary';
+  type: 'carousel' | 'card' | 'form' | 'summary' | 'stopover-categories' | 'hotels' | 'stopover-options' | 'stopover-extras' | 'tours';
   data: any;
 }
 
