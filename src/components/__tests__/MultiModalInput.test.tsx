@@ -10,7 +10,10 @@ global.MediaRecorder = jest.fn().mockImplementation(() => ({
   stop: jest.fn(),
   ondataavailable: jest.fn(),
   onstop: jest.fn(),
-}));
+})) as any;
+
+// Add isTypeSupported static method
+(global.MediaRecorder as any).isTypeSupported = jest.fn().mockReturnValue(true);
 
 // Mock getUserMedia
 Object.defineProperty(navigator, 'mediaDevices', {

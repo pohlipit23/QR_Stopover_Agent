@@ -1,0 +1,208 @@
+---
+import Layout from '../components/Layout.astro';
+---
+
+<Layout title="Enhanced Features Test">
+  <div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-4xl mx-auto px-4">
+      <h1 class="text-3xl font-bold text-gray-800 mb-8">Enhanced Form and Summary Features Test</h1>
+      
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Payment Form Test -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Enhanced Payment Form</h2>
+          <div id="payment-form-test"></div>
+        </div>
+        
+        <!-- Summary Test -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Enhanced Summary Renderer</h2>
+          <div id="summary-test"></div>
+        </div>
+        
+        <!-- Confirmation Test -->
+        <div class="bg-white rounded-lg shadow-lg p-6 lg:col-span-2">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Booking Confirmation Summary</h2>
+          <div id="confirmation-test"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import React from 'react';
+  import { createRoot } from 'react-dom/client';
+  import MessageBubble from '../components/MessageBubble';
+
+  // Payment Form Test
+  const paymentFormMessage = {
+    id: '1',
+    sender: 'agent',
+    content: {
+      type: 'form',
+      text: 'Please complete your payment details to finalize your stopover booking.',
+      formData: {
+        type: 'payment',
+        fields: [],
+        submitLabel: 'Complete Payment',
+        data: {
+          totalAmount: 415,
+          totalAviosPrice: 51875,
+          aviosBalance: 275000
+        }
+      }
+    },
+    timestamp: new Date()
+  };
+
+  // Summary Test
+  const summaryMessage = {
+    id: '2',
+    sender: 'agent',
+    content: {
+      type: 'summary',
+      text: 'Here is your complete booking summary with enhanced flight routing visualization.',
+      richContent: {
+        type: 'summary',
+        data: {
+          title: 'Stopover Booking Summary',
+          flightRoute: {
+            origin: 'LHR',
+            destination: 'BKK',
+            stopover: 'DOH',
+            timing: 'Outbound',
+            duration: '2 nights'
+          },
+          sections: [
+            {
+              title: 'Hotel Details',
+              items: [
+                { label: 'Hotel', value: 'Millennium Hotel Doha' },
+                { label: 'Category', value: 'Premium (4-star)' },
+                { label: 'Duration', value: '2 nights' }
+              ]
+            },
+            {
+              title: 'Selected Extras',
+              items: [
+                { label: 'Airport Transfers', value: '$60' },
+                { label: 'Whale Sharks of Qatar Tour', value: '$195 × 2 passengers' }
+              ]
+            }
+          ],
+          pricing: {
+            breakdown: [
+              { label: 'Hotel (2 nights)', value: '$300' },
+              { label: 'Flight fare difference', value: '$115' },
+              { label: 'Airport transfers', value: '$60' },
+              { label: 'Tours', value: '$390' }
+            ],
+            total: '$865',
+            aviosEquivalent: '108,125 Avios'
+          },
+          actions: [
+            { type: 'edit', label: 'Edit Selection', primary: false },
+            { type: 'proceed', label: 'Proceed to Payment', primary: true }
+          ]
+        }
+      }
+    },
+    timestamp: new Date()
+  };
+
+  // Confirmation Test
+  const confirmationMessage = {
+    id: '3',
+    sender: 'agent',
+    content: {
+      type: 'summary',
+      text: 'Congratulations! Your stopover has been successfully added to your booking.',
+      richContent: {
+        type: 'summary',
+        data: {
+          title: 'Booking Confirmation',
+          type: 'confirmation',
+          newPNR: 'X9FG1',
+          flightRoute: {
+            origin: 'LHR',
+            destination: 'BKK',
+            stopover: 'DOH (2 nights)',
+            timing: 'Outbound stopover',
+            duration: '2 nights in Doha'
+          },
+          sections: [
+            {
+              title: 'Booking Details',
+              items: [
+                { label: 'Original PNR', value: 'X4HG8' },
+                { label: 'New PNR', value: 'X9FG1', highlight: true },
+                { label: 'Passengers', value: '2 adults' },
+                { label: 'Payment Method', value: 'Credit Card ending in 3456' }
+              ]
+            },
+            {
+              title: 'Stopover Details',
+              items: [
+                { label: 'Hotel', value: 'Millennium Hotel Doha' },
+                { label: 'Check-in', value: 'Dec 15, 2024' },
+                { label: 'Check-out', value: 'Dec 17, 2024' },
+                { label: 'Extras', value: 'Airport transfers, Whale Sharks tour' }
+              ]
+            }
+          ],
+          pricing: {
+            total: '$865',
+            aviosEquivalent: '108,125 Avios (saved for future use)'
+          }
+        }
+      }
+    },
+    timestamp: new Date()
+  };
+
+  // Render components
+  const paymentFormContainer = document.getElementById('payment-form-test');
+  if (paymentFormContainer) {
+    const root = createRoot(paymentFormContainer);
+    root.render(
+      React.createElement(MessageBubble, {
+        message: paymentFormMessage,
+        sender: 'agent',
+        timestamp: paymentFormMessage.timestamp,
+        onFormSubmit: (formData) => {
+          console.log('Payment form submitted:', formData);
+          alert('Payment form submitted! Check console for details.');
+        }
+      })
+    );
+  }
+
+  const summaryContainer = document.getElementById('summary-test');
+  if (summaryContainer) {
+    const root = createRoot(summaryContainer);
+    root.render(
+      React.createElement(MessageBubble, {
+        message: summaryMessage,
+        sender: 'agent',
+        timestamp: summaryMessage.timestamp,
+        onRichContentAction: (action, data) => {
+          console.log('Summary action:', action, data);
+          alert(`Action: ${action}`);
+        }
+      })
+    );
+  }
+
+  const confirmationContainer = document.getElementById('confirmation-test');
+  if (confirmationContainer) {
+    const root = createRoot(confirmationContainer);
+    root.render(
+      React.createElement(MessageBubble, {
+        message: confirmationMessage,
+        sender: 'agent',
+        timestamp: confirmationMessage.timestamp
+      })
+    );
+  }
+</script>

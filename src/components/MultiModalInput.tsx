@@ -391,7 +391,7 @@ const MultiModalInput: React.FC<MultiModalInputProps> = ({
         {/* Send Button */}
         <button
           type="submit"
-          disabled={disabled || isLoading || !textInput.trim() || voiceState.isRecording || voiceState.isProcessing}
+          disabled={disabled || isLoading || voiceState.isRecording || voiceState.isProcessing}
           className="p-3 bg-primary-burgundy text-white rounded-full hover:bg-primary-burgundy-dark transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-3 focus:ring-primary-burgundy focus:ring-opacity-30"
           style={{
             minWidth: '44px',

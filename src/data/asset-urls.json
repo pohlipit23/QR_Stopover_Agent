@@ -1,0 +1,35 @@
+{
+  "generatedAt": "2025-09-08T04:15:28.712Z",
+  "r2BaseUrl": "https://pub-example.r2.dev",
+  "assets": {
+    "brand": {
+      "qatarairwayslogopng": "https://pub-example.r2.dev/logos/qatar-airways-logo.png",
+      "privilegeclublogopng": "https://pub-example.r2.dev/logos/privilege-club-logo.png"
+    },
+    "hotels": {
+      "milleniumhotelwebp": "https://pub-example.r2.dev/hotels/millenium_hotel.webp",
+      "steigenbergerhotelwebp": "https://pub-example.r2.dev/hotels/steigenberger_hotel.webp",
+      "souqwaqifhotelwebp": "https://pub-example.r2.dev/hotels/souq_waqif_hotel.webp",
+      "crowneplazahotelwebp": "https://pub-example.r2.dev/hotels/crowne_plaza_hotel.webp",
+      "alnajadahotelwebp": "https://pub-example.r2.dev/hotels/al_najada_hotel.webp",
+      "raffleshoteldohajpg": "https://pub-example.r2.dev/hotels/raffles_hotel_doha.jpg"
+    },
+    "categories": {
+      "standardstopoverjpg": "https://pub-example.r2.dev/categories/standard_stopover.jpg",
+      "premiumstopoverjpg": "https://pub-example.r2.dev/categories/premium_stopover.jpg",
+      "premiumbeachstopoverjpg": "https://pub-example.r2.dev/categories/premium_beach_stopover.jpg",
+      "luxurystopoverjpg": "https://pub-example.r2.dev/categories/luxury_stopover.jpg"
+    },
+    "tours": {
+      "whalesharksofqatarjpg": "https://pub-example.r2.dev/tours/whale_sharks_of_qatar.jpg",
+      "shalesharkwebp": "https://pub-example.r2.dev/tours/shale_shark.webp",
+      "thepearljpg": "https://pub-example.r2.dev/tours/the_pearl.jpg",
+      "airporttransferwebp": "https://pub-example.r2.dev/tours/airport_transfer.webp"
+    },
+    "general": {
+      "stopoverjpg": "https://pub-example.r2.dev/general/stopover.jpg",
+      "stopoverprogramjpeg": "https://pub-example.r2.dev/general/stopover_program.jpeg",
+      "planeskylinejpg": "https://pub-example.r2.dev/general/plane_skyline.jpg"
+    }
+  }
+}

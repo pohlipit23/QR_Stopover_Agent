@@ -1,15 +1,49 @@
 import { z } from 'zod';
-import { tool } from 'ai';
 import { stopoverCategories } from '../data/stopoverCategories';
 import { premiumHotels } from '../data/hotelData';
 import { availableTours, whaleSharksTour } from '../data/tourData';
 import { defaultTransferOption } from '../data/transferData';
 
+// Define parameter schemas
+const emptyCategorySchema = z.object({});
+const categorySelectionSchema = z.object({
+  categoryId: z.string().describe('The ID of the selected stopover category'),
+  categoryName: z.string().describe('The name of the selected category')
+});
+const hotelSelectionSchema = z.object({
+  hotelId: z.string().describe('The ID of the selected hotel'),
+  hotelName: z.string().describe('The name of the selected hotel')
+});
+const timingDurationSchema = z.object({
+  timing: z.enum(['outbound', 'return']).describe('Whether stopover is on outbound or return journey'),
+  duration: z.number().min(1).max(4).describe('Number of nights for the stopover')
+});
+const extrasSelectionSchema = z.object({
+  includeTransfers: z.boolean().describe('Whether to include airport transfers'),
+  selectedTours: z.array(z.object({
+    tourId: z.string(),
+    tourName: z.string(),
+    quantity: z.number(),
+    totalPrice: z.number()
+  })).describe('Array of selected tours with quantities'),
+  totalExtrasPrice: z.number().describe('Total price of all selected extras')
+});
+const paymentInitiationSchema = z.object({
+  paymentMethod: z.enum(['credit-card', 'avios']).describe('Selected payment method'),
+  totalAmount: z.number().describe('Total amount to be paid')
+});
+const bookingCompletionSchema = z.object({
+  paymentData: z.object({
+    method: z.string(),
+    confirmed: z.boolean()
+  }).describe('Payment confirmation data')
+});
+
 // Function to show stopover categories
-export const showStopoverCategories = tool({
+export const showStopoverCategories = {
   description: 'Display available stopover categories to the customer with interactive carousel',
-  parameters: z.object({}),
-  execute: async () => {
+  inputSchema: emptyCategorySchema,
+  execute: async (params: any) => {
     return {
       success: true,
       categories: stopoverCategories,
@@ -22,16 +56,13 @@ export const showStopoverCategories = tool({
       message: 'Here are our stopover categories. Each offers different levels of comfort and amenities:'
     };
   }
-});
+};
 
 // Function to handle category selection and show hotels
-export const selectStopoverCategory = tool({
+export const selectStopoverCategory = {
   description: 'Process stopover category selection and display available hotels',
-  parameters: z.object({
-    categoryId: z.string().describe('The ID of the selected stopover category'),
-    categoryName: z.string().describe('The name of the selected category')
-  }),
-  execute: async ({ categoryId, categoryName }) => {
+  inputSchema: categorySelectionSchema,
+  execute: async ({ categoryId, categoryName }: any) => {
     return {
       success: true,
       selectedCategory: categoryId,
@@ -46,16 +77,13 @@ export const selectStopoverCategory = tool({
       message: `Great choice! You've selected the ${categoryName} category. Now let's choose your hotel from our premium selection:`
     };
   }
-});
+};
 
 // Function to handle hotel selection and show timing options
-export const selectHotel = tool({
+export const selectHotel = {
   description: 'Process hotel selection and display stopover timing and duration options',
-  parameters: z.object({
-    hotelId: z.string().describe('The ID of the selected hotel'),
-    hotelName: z.string().describe('The name of the selected hotel')
-  }),
-  execute: async ({ hotelId, hotelName }) => {
+  inputSchema: hotelSelectionSchema,
+  execute: async ({ hotelId, hotelName }: any) => {
     return {
       success: true,
       selectedHotel: hotelId,
@@ -72,16 +100,13 @@ export const selectHotel = tool({
       message: `Perfect! You've selected ${hotelName}. Now let's configure when you'd like your stopover and for how long:`
     };
   }
-});
+};
 
 // Function to handle timing and duration selection
-export const selectTimingAndDuration = tool({
+export const selectTimingAndDuration = {
   description: 'Process stopover timing and duration selection, then show extras',
-  parameters: z.object({
-    timing: z.enum(['outbound', 'return']).describe('Whether stopover is on outbound or return journey'),
-    duration: z.number().min(1).max(4).describe('Number of nights for the stopover')
-  }),
-  execute: async ({ timing, duration }) => {
+  inputSchema: timingDurationSchema,
+  execute: async ({ timing, duration }: any) => {
     return {
       success: true,
       selectedTiming: timing,
@@ -100,26 +125,17 @@ export const selectTimingAndDuration = tool({
       message: `Excellent! You've chosen a ${duration}-night ${timing} stopover. Now let's enhance your experience with some optional extras:`
     };
   }
-});
+};
 
 // Function to handle extras selection
-export const selectExtras = tool({
+export const selectExtras = {
   description: 'Process extras selection (transfers and tours) and show booking summary',
-  parameters: z.object({
-    includeTransfers: z.boolean().describe('Whether to include airport transfers'),
-    selectedTours: z.array(z.object({
-      tourId: z.string(),
-      tourName: z.string(),
-      quantity: z.number(),
-      totalPrice: z.number()
-    })).describe('Array of selected tours with quantities'),
-    totalExtrasPrice: z.number().describe('Total price of all selected extras')
-  }),
-  execute: async ({ includeTransfers, selectedTours, totalExtrasPrice }) => {
+  inputSchema: extrasSelectionSchema,
+  execute: async ({ includeTransfers, selectedTours, totalExtrasPrice }: any) => {
     const baseHotelCost = 150 * 2; // Assuming 2 nights at $150/night
     const flightFareDifference = 115;
     const transfersCost = includeTransfers ? 60 : 0;
-    const toursCost = selectedTours.reduce((sum, tour) => sum + tour.totalPrice, 0);
+    const toursCost = selectedTours.reduce((sum: number, tour: any) => sum + tour.totalPrice, 0);
     const totalCashPrice = baseHotelCost + flightFareDifference + transfersCost + toursCost;
     const totalAviosPrice = totalCashPrice * 125; // 125 Avios per $1
 
@@ -143,34 +159,31 @@ export const selectExtras = tool({
         data: {
           title: 'Booking Summary',
           items: [
-            { label: 'Hotel (2 nights)', value: `$${baseHotelCost}` },
-            { label: 'Flight fare difference', value: `$${flightFareDifference}` },
-            ...(includeTransfers ? [{ label: 'Airport transfers', value: `$${transfersCost}` }] : []),
-            ...selectedTours.map(tour => ({ 
+            { label: 'Hotel (2 nights)', value: `${baseHotelCost}` },
+            { label: 'Flight fare difference', value: `${flightFareDifference}` },
+            ...(includeTransfers ? [{ label: 'Airport transfers', value: `${transfersCost}` }] : []),
+            ...selectedTours.map((tour: any) => ({ 
               label: `${tour.tourName} (${tour.quantity}x)`, 
-              value: `$${tour.totalPrice}` 
+              value: `${tour.totalPrice}` 
             }))
           ],
-          total: `$${totalCashPrice}`,
+          total: `${totalCashPrice}`,
           aviosOption: `${totalAviosPrice.toLocaleString()} Avios`,
           actions: [
             { type: 'payment', label: 'Proceed to Payment', primary: true }
           ]
         }
       },
-      message: `Perfect! Here's your complete stopover package summary. Your total is $${totalCashPrice} or ${totalAviosPrice.toLocaleString()} Avios.`
+      message: `Perfect! Here's your complete stopover package summary. Your total is ${totalCashPrice} or ${totalAviosPrice.toLocaleString()} Avios.`
     };
   }
-});
+};
 
 // Function to initiate payment
-export const initiatePayment = tool({
+export const initiatePayment = {
   description: 'Initialize the payment process for the stopover booking',
-  parameters: z.object({
-    paymentMethod: z.enum(['credit-card', 'avios']).describe('Selected payment method'),
-    totalAmount: z.number().describe('Total amount to be paid')
-  }),
-  execute: async ({ paymentMethod, totalAmount }) => {
+  inputSchema: paymentInitiationSchema,
+  execute: async ({ paymentMethod, totalAmount }: any) => {
     return {
       success: true,
       paymentInitialized: true,
@@ -191,22 +204,17 @@ export const initiatePayment = tool({
         }
       },
       message: paymentMethod === 'credit-card' 
-        ? `Please enter your payment details to complete your booking for $${totalAmount}:`
+        ? `Please enter your payment details to complete your booking for ${totalAmount}:`
         : `Please login to your Privilege Club account to pay with Avios:`
     };
   }
-});
+};
 
 // Function to complete booking
-export const completeBooking = tool({
+export const completeBooking = {
   description: 'Complete the stopover booking and generate confirmation',
-  parameters: z.object({
-    paymentData: z.object({
-      method: z.string(),
-      confirmed: z.boolean()
-    }).describe('Payment confirmation data')
-  }),
-  execute: async ({ paymentData }) => {
+  inputSchema: bookingCompletionSchema,
+  execute: async ({ paymentData }: any) => {
     const newPNR = 'X9FG1';
     
     return {
@@ -232,7 +240,7 @@ export const completeBooking = tool({
       message: `🎉 Congratulations! Your stopover booking is confirmed. Your new PNR is ${newPNR}. You'll receive a confirmation email shortly with all the details.`
     };
   }
-});
+};
 
 // Export all booking functions
 export const bookingFunctions = {

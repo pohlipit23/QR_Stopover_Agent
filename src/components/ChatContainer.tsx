@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+// @ts-ignore - AI SDK import issue
 import { useChat } from 'ai/react';
 import MessageBubble from './MessageBubble';
 import MultiModalInput from './MultiModalInput';
@@ -40,14 +41,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   // LLM Chat integration using Vercel AI SDK
   const {
     messages: chatMessages,
-    input,
-    handleInputChange,
-    handleSubmit,
     isLoading: isLLMLoading,
     error: llmError,
-    append,
-    reload,
-    stop
+    append
   } = useChat({
     api: '/api/chat',
     body: {
@@ -57,7 +53,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         entryPoint
       }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       console.error('LLM Chat error:', error);
       handleError({
         type: 'llm',
@@ -65,7 +61,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         retryable: true
       });
     },
-    onFinish: (message) => {
+    onFinish: (message: any) => {
       console.log('LLM response finished:', message);
     }
   });
@@ -123,7 +119,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
   // Sync LLM messages with local state
   useEffect(() => {
-    const convertedMessages: Message[] = chatMessages.map((msg, index) => ({
+    const convertedMessages: Message[] = chatMessages.map((msg: any, index: number) => ({
       id: msg.id || `msg_${Date.now()}_${index}`,
       sender: msg.role === 'user' ? 'user' : 'agent',
       content: {
@@ -359,7 +355,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
           <div className="flex-1">
             <h4 className="text-accent-red font-medium mb-1">
               {state.error.type === 'validation' ? 'Validation Error' : 
-               state.error.type === 'network' ? 'Connection Error' : 'System Error'}
+               state.error.type === 'network' ? 'Connection Error' : 
+               state.error.type === 'llm' ? 'AI Assistant Error' :
+               state.error.type === 'function-call' ? 'Function Call Error' : 'System Error'}
             </h4>
             <p className="text-neutral-grey2 text-sm">{state.error.message}</p>
             {state.error.retryable && (

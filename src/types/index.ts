@@ -139,10 +139,54 @@ export interface RichContent {
   data: any;
 }
 
+export interface SummaryData {
+  title?: string;
+  type?: 'confirmation' | 'booking' | 'payment';
+  newPNR?: string;
+  flightRoute?: {
+    origin: string;
+    destination: string;
+    stopover?: string;
+    timing?: string;
+    duration?: string;
+  };
+  sections?: SummarySection[];
+  items?: SummaryItem[];
+  pricing?: {
+    breakdown?: SummaryItem[];
+    total?: string;
+    aviosEquivalent?: string;
+  };
+  actions?: SummaryAction[];
+}
+
+export interface SummarySection {
+  title: string;
+  items: SummaryItem[];
+}
+
+export interface SummaryItem {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}
+
+export interface SummaryAction {
+  type: string;
+  label: string;
+  primary?: boolean;
+  data?: any;
+}
+
 export interface FormContent {
   type: 'payment' | 'selection' | 'login';
   fields: FormField[];
   submitLabel: string;
+  data?: {
+    totalAmount?: number;
+    totalAviosPrice?: number;
+    aviosBalance?: number;
+  };
 }
 
 export interface FormField {
@@ -221,7 +265,7 @@ export interface AddOnOption {
 
 // Error and Loading State Models
 export interface ErrorState {
-  type: 'validation' | 'system' | 'network';
+  type: 'validation' | 'system' | 'network' | 'llm' | 'function-call';
   message: string;
   recoveryAction?: string;
   retryable: boolean;

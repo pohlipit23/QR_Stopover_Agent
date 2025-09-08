@@ -82,6 +82,64 @@ export {
   validateImagePaths
 } from './dataValidation';
 
+// Asset-aware data functions using Cloudflare R2 storage
+import { getAssetManager } from '../lib/cloudflare/asset-manager';
+
+/**
+ * Get hotel data with R2 asset URLs
+ */
+export function getHotelsWithAssets() {
+  const assetManager = getAssetManager();
+  const hotelImages = assetManager.getHotelImages();
+  
+  return premiumHotels.map((hotel: any) => ({
+    ...hotel,
+    image: hotelImages[hotel.id as keyof typeof hotelImages] || hotel.image,
+  }));
+}
+
+/**
+ * Get stopover categories with R2 asset URLs
+ */
+export function getCategoriesWithAssets() {
+  const assetManager = getAssetManager();
+  const categoryImages = assetManager.getCategoryImages();
+  
+  return stopoverCategories.map((category: any) => ({
+    ...category,
+    image: categoryImages[category.id as keyof typeof categoryImages] || category.image,
+  }));
+}
+
+/**
+ * Get tour data with R2 asset URLs
+ */
+export function getToursWithAssets() {
+  const assetManager = getAssetManager();
+  const tourImages = assetManager.getTourImages();
+  
+  return availableTours.map((tour: any) => ({
+    ...tour,
+    image: tourImages[tour.id as keyof typeof tourImages] || tour.image,
+  }));
+}
+
+/**
+ * Get brand logos with R2 asset URLs
+ */
+export function getBrandLogosWithAssets() {
+  const assetManager = getAssetManager();
+  return assetManager.getBrandLogos();
+}
+
+/**
+ * Get all asset URLs for components
+ */
+export function getAllAssetUrls() {
+  const assetManager = getAssetManager();
+  return assetManager.getAssetUrls();
+}
+
 // Re-export types for convenience
 export type {
   CustomerData,
