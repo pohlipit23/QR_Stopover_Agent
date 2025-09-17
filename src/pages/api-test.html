@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-6">API Test</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-lg font-semibold mb-4">Test Chat API</h2>
+            <button id="testApi" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                Test API Call
+            </button>
+            <div id="result" class="mt-4 p-4 bg-gray-100 rounded hidden">
+                <h3 class="font-semibold">Result:</h3>
+                <pre id="resultText" class="text-sm mt-2 whitespace-pre-wrap"></pre>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-4">Console Output</h2>
+            <p class="text-sm text-gray-600">Check the browser console (F12) for detailed logs.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('testApi').addEventListener('click', async () => {
+            console.log('Testing API...');
+            const resultDiv = document.getElementById('result');
+            const resultText = document.getElementById('resultText');
+            
+            try {
+                const response = await fetch('/api/chat-simple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: 'user',
+                                content: 'Hello, I want to add a stopover to my booking.'
+                            }
+                        ]
+                    })
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API Error:', errorText);
+                    resultText.textContent = `Error ${response.status}: ${errorText}`;
+                    resultDiv.classList.remove('hidden');
+                    return;
+                }
+
+                // Handle streaming response
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let result = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    result += chunk;
+                    console.log('Chunk received:', chunk);
+                }
+
+                console.log('Full response:', result);
+                resultText.textContent = result;
+                resultDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultText.textContent = `Fetch Error: ${error.message}`;
+                resultDiv.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

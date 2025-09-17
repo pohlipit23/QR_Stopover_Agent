@@ -1,0 +1,47 @@
+---
+// Simple development test page
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dev Test - Qatar Stopover AI Agent</title>
+  </head>
+  <body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-3xl font-bold text-gray-800 mb-6">Development Test Page</h1>
+      
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Environment Status</h2>
+        <div class="space-y-2">
+          <p><strong>Node Environment:</strong> {import.meta.env.NODE_ENV || 'development'}</p>
+          <p><strong>Astro Mode:</strong> {import.meta.env.MODE}</p>
+          <p><strong>Build Time:</strong> {new Date().toISOString()}</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h2 class="text-xl font-semibold mb-4">Basic Functionality Test</h2>
+        <p class="text-gray-600 mb-4">This page loads successfully, which means:</p>
+        <ul class="list-disc list-inside space-y-1 text-gray-600">
+          <li>Astro is running correctly</li>
+          <li>TypeScript compilation is working</li>
+          <li>Tailwind CSS is loaded</li>
+          <li>Basic routing is functional</li>
+        </ul>
+      </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Next Steps</h2>
+        <p class="text-gray-600 mb-4">To test the full application:</p>
+        <ol class="list-decimal list-inside space-y-1 text-gray-600">
+          <li>Set up your environment variables (OPENROUTER_API_KEY)</li>
+          <li>Visit <a href="/" class="text-blue-600 hover:underline">the main page</a></li>
+          <li>Test the chat functionality</li>
+        </ol>
+      </div>
+    </div>
+  </body>
+</html>

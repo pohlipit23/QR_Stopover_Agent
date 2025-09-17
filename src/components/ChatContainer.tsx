@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-// @ts-ignore - AI SDK import issue
 import { useChat } from 'ai/react';
 import MessageBubble from './MessageBubble';
 import MultiModalInput from './MultiModalInput';
@@ -45,7 +44,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     error: llmError,
     append
   } = useChat({
-    api: '/api/chat',
+    api: '/api/chat-minimal',
     body: {
       conversationContext: {
         customer,

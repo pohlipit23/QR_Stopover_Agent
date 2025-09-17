@@ -1,0 +1,80 @@
+---
+// Minimal debug chat page without Layout component
+const sampleCustomer = {
+  name: 'John Smith',
+  privilegeClubNumber: 'QR123456789',
+  email: 'john.smith@example.com'
+};
+
+const sampleBooking = {
+  pnr: 'ABC123',
+  route: {
+    origin: 'LHR',
+    destination: 'BKK',
+    stops: ['DOH'],
+    routing: 'LHR-DOH-BKK'
+  },
+  passengers: 2,
+  status: 'confirmed'
+};
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Chat - Qatar Airways</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-100">
+    <div class="min-h-screen">
+      <div class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Debug Chat Test</h1>
+            <p class="text-gray-600">Minimal version for debugging</p>
+          </div>
+          
+          <div class="bg-white rounded-lg shadow-lg h-[600px]" id="chat-container">
+            <!-- Chat will be loaded here -->
+          </div>
+          
+          <div class="mt-6 text-center text-sm text-gray-500">
+            <p>Check the browser console for debug information.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Load React component -->
+    <script type="module">
+      import SimpleChatContainer from '/src/components/SimpleChatContainer.tsx';
+      import { createElement } from 'react';
+      import { createRoot } from 'react-dom/client';
+
+      const container = document.getElementById('chat-container');
+      const root = createRoot(container);
+      
+      const customer = {
+        name: 'John Smith',
+        privilegeClubNumber: 'QR123456789',
+        email: 'john.smith@example.com'
+      };
+
+      const booking = {
+        pnr: 'ABC123',
+        route: {
+          origin: 'LHR',
+          destination: 'BKK',
+          stops: ['DOH'],
+          routing: 'LHR-DOH-BKK'
+        },
+        passengers: 2,
+        status: 'confirmed'
+      };
+
+      root.render(createElement(SimpleChatContainer, { customer, booking }));
+    </script>
+  </body>
+</html>

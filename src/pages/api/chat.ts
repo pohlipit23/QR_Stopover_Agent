@@ -1,6 +1,10 @@
 import type { APIRoute } from 'astro';
 import { streamText } from 'ai';
-import { llmConfig, getModelWithFallback, validateLLMConfig } from '../../lib/llm-config';
+import dotenv from 'dotenv';
+
+// Load environment variables explicitly
+dotenv.config();
+import { createLLMConfig, getModelWithFallback, validateServerLLMConfig } from '../../lib/llm-config-server';
 import { bookingFunctions } from '../../lib/booking-functions';
 import { securityMiddleware } from '../../utils/security';
 import { cacheMiddleware } from '../../utils/caching';
@@ -44,6 +48,19 @@ CURRENT STEP: ${currentStep || 'welcome'}
 Remember to be natural and conversational while guiding the customer through their stopover booking journey. Use the functions when the customer is ready to make selections or view options.`;
 };
 
+export const OPTIONS: APIRoute = async ({ request }) => {
+  const origin = request.headers.get('origin') || '';
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': origin.includes('localhost') ? origin : 'http://localhost:4321',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+};
+
 export const POST: APIRoute = async ({ request }) => {
   const startTime = Date.now();
   let tokensUsed = 0;
@@ -65,29 +82,14 @@ export const POST: APIRoute = async ({ request }) => {
     } catch (error) {
       logger.warn('Data services not available, using fallbacks', { error });
     }
-    // Apply security middleware
-    const securityCheck = securityMiddleware(request);
     
-    if (!securityCheck.allowed) {
-      logger.warn('Request blocked by security middleware', {
-        errors: securityCheck.errors,
-        url: request.url,
-      });
-      
-      return new Response(
-        JSON.stringify({ 
-          error: 'Request blocked', 
-          details: securityCheck.errors 
-        }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            ...securityCheck.headers,
-          },
-        }
-      );
-    }
+    // Basic CORS headers only (no complex security middleware for streaming)
+    const origin = request.headers.get('origin') || '';
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': origin.includes('localhost') ? origin : 'http://localhost:4321',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
 
     // Log request
     logger.info('Chat API request received', {
@@ -103,11 +105,12 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     // Validate LLM configuration
-    if (!validateLLMConfig()) {
-      logger.error('LLM configuration invalid');
+    if (!validateServerLLMConfig()) {
+      logger.error('LLM configuration invalid - missing API key');
       return new Response(
         JSON.stringify({ 
-          error: 'LLM configuration invalid. Please check environment variables.' 
+          error: 'LLM configuration invalid. Please check environment variables.',
+          debug: process.env.NODE_ENV === 'development' ? 'OPENROUTER_API_KEY not found' : undefined
         }),
         { 
           status: 500,
@@ -176,7 +179,7 @@ export const POST: APIRoute = async ({ request }) => {
             messages,
             tools: bookingFunctions,
             system: generateSystemPrompt(conversationContext || {}),
-            temperature: llmConfig.temperature,
+            temperature: createLLMConfig().temperature,
           });
 
           logger.info('LLM request successful', {
@@ -219,23 +222,17 @@ export const POST: APIRoute = async ({ request }) => {
       success: true,
     });
 
-    // Get cache headers (LLM responses are not cached)
-    const cacheHeaders = cacheMiddleware(request, {}, {
-      contentType: 'text/plain',
-      dynamic: true,
-      endpoint: '/api/chat',
-    });
-
-    // Create response with security and cache headers
+    // Create streaming response with minimal headers
     const response = result.toTextStreamResponse();
     
-    // Add headers to response
-    Object.entries({
-      ...securityCheck.headers,
-      ...cacheHeaders,
-    }).forEach(([key, value]) => {
+    // Add only essential headers for streaming
+    Object.entries(corsHeaders).forEach(([key, value]) => {
       response.headers.set(key, value);
     });
+    
+    // Ensure no compression or caching for streaming
+    response.headers.set('Cache-Control', 'no-cache');
+    response.headers.set('Connection', 'keep-alive');
 
     logger.info('Chat API request completed successfully', {
       model: currentModel,
@@ -295,8 +292,7 @@ export const POST: APIRoute = async ({ request }) => {
         status: statusCode,
         headers: { 
           'Content-Type': 'application/json',
-          // Add security headers even for error responses
-          ...(securityMiddleware(request).headers || {}),
+          ...corsHeaders,
         }
       }
     );

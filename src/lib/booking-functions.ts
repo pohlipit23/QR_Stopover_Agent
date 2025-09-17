@@ -42,7 +42,7 @@ const bookingCompletionSchema = z.object({
 // Function to show stopover categories
 export const showStopoverCategories = {
   description: 'Display available stopover categories to the customer with interactive carousel',
-  inputSchema: emptyCategorySchema,
+  parameters: emptyCategorySchema,
   execute: async (params: any) => {
     return {
       success: true,
@@ -61,7 +61,7 @@ export const showStopoverCategories = {
 // Function to handle category selection and show hotels
 export const selectStopoverCategory = {
   description: 'Process stopover category selection and display available hotels',
-  inputSchema: categorySelectionSchema,
+  parameters: categorySelectionSchema,
   execute: async ({ categoryId, categoryName }: any) => {
     return {
       success: true,
@@ -82,7 +82,7 @@ export const selectStopoverCategory = {
 // Function to handle hotel selection and show timing options
 export const selectHotel = {
   description: 'Process hotel selection and display stopover timing and duration options',
-  inputSchema: hotelSelectionSchema,
+  parameters: hotelSelectionSchema,
   execute: async ({ hotelId, hotelName }: any) => {
     return {
       success: true,
@@ -105,7 +105,7 @@ export const selectHotel = {
 // Function to handle timing and duration selection
 export const selectTimingAndDuration = {
   description: 'Process stopover timing and duration selection, then show extras',
-  inputSchema: timingDurationSchema,
+  parameters: timingDurationSchema,
   execute: async ({ timing, duration }: any) => {
     return {
       success: true,
@@ -130,7 +130,7 @@ export const selectTimingAndDuration = {
 // Function to handle extras selection
 export const selectExtras = {
   description: 'Process extras selection (transfers and tours) and show booking summary',
-  inputSchema: extrasSelectionSchema,
+  parameters: extrasSelectionSchema,
   execute: async ({ includeTransfers, selectedTours, totalExtrasPrice }: any) => {
     const baseHotelCost = 150 * 2; // Assuming 2 nights at $150/night
     const flightFareDifference = 115;
@@ -182,7 +182,7 @@ export const selectExtras = {
 // Function to initiate payment
 export const initiatePayment = {
   description: 'Initialize the payment process for the stopover booking',
-  inputSchema: paymentInitiationSchema,
+  parameters: paymentInitiationSchema,
   execute: async ({ paymentMethod, totalAmount }: any) => {
     return {
       success: true,
@@ -213,7 +213,7 @@ export const initiatePayment = {
 // Function to complete booking
 export const completeBooking = {
   description: 'Complete the stopover booking and generate confirmation',
-  inputSchema: bookingCompletionSchema,
+  parameters: bookingCompletionSchema,
   execute: async ({ paymentData }: any) => {
     const newPNR = 'X9FG1';
     
